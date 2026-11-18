@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>추가 화면 · 내 배우자는 탕진잼</title>
+<link rel="icon" href="images/logo.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --pink:#ff5c93; --pink-soft:#ffe3ec; --navy:#14275a; --navy-soft:#e8ecf6;
+  --gray:#8a8f99; --line:#e6e8ee; --red:#e5484d; --green:#1f9d6b;
+  --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:#e9ecf3;font-family:var(--font);color:var(--navy)}
+button{font-family:inherit;border:0;background:none;color:inherit}
+body.view{height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+
+/* ===== 목차 ===== */
+#toc{max-width:520px;margin:32px auto;background:#fff;border-radius:16px;padding:24px}
+#toc h1{font-size:20px;margin:0 0 20px}
+#toc h2{font-size:14px;color:#666;margin:20px 0 8px}
+#toc ul{list-style:none}
+#toc li a{display:flex;gap:12px;padding:10px 12px;border-radius:8px;color:inherit;text-decoration:none}
+#toc li a:hover{background:#f0f0f4}
+#toc .id{font-weight:700;width:36px}
+body.view #toc{display:none}
+#back{display:none;position:fixed;top:12px;left:12px;z-index:99;padding:8px 14px;border-radius:18px;background:#fff;color:var(--navy);font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px rgba(20,39,90,.15)}
+body.view #back{display:block}
+body.capture #back{display:none}
+
+/* ===== 폰 프레임 ===== */
+.phone{
+  position:relative;width:390px;height:844px;flex:none;overflow:hidden;
+  background:#fff;border-radius:44px;border:10px solid #1b1d24;
+  box-shadow:0 24px 60px rgba(20,39,90,.28);transform-origin:center center;box-sizing:content-box;
+}
+@media (max-width:430px){
+  body.view{background:#fff}
+  .phone{width:100vw;height:100vh;height:100dvh;border:0;border-radius:0;box-shadow:none;transform:none!important}
+}
+.pc{position:relative;width:1440px;height:900px;flex:none;overflow:hidden;background:#f4f6fa;transform-origin:center center;box-shadow:0 24px 60px rgba(20,39,90,.2)}
+
+.save{position:absolute;left:0;right:0;bottom:8px;z-index:40;text-align:center;font-size:11px;color:var(--gray)}
+.ph{display:flex;align-items:center;justify-content:center;text-align:center;background:#cfd2d9;color:#555a66;font-size:11px;padding:8px;word-break:break-all}
+.ph::before{content:"🖼 "}
+
+/* ===== 공통 ===== */
+/* 빈 공간에 배우자 누끼 PNG 배치 */
+.chars{flex:1;position:relative;min-height:0}
+.chars .in{position:absolute;inset:0;display:flex;justify-content:center;align-items:flex-end;gap:6px}
+.chars img,.chars .ph{height:100%;width:auto;max-width:48%;aspect-ratio:700/1024;object-fit:contain;object-position:bottom;display:block}
+.chars .ph{width:48%;height:80%}
+.side{position:relative}
+.side .chars{position:absolute;left:0;right:0;bottom:0;height:340px;flex:none;padding:0 10px}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:64px 24px 44px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:14px;font-size:16px;font-weight:700}
+.btn.pink{background:var(--pink);color:#fff}
+.sp{flex:1}
+
+/* A01 */
+.a01 .logo-wrap{flex:none;padding-top:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+/* logo.png는 사방 투명 여백이 커서 박스를 화면보다 넓게 잡아야 크게 보인다 (index.html S00과 동일, 비율 유지) */
+.a01 .logo-wrap img,.a01 .logo-wrap .ph{display:block;flex:none;width:130%;height:auto;aspect-ratio:1408/768;object-fit:contain}
+.a01 .tag{font-size:15px;color:var(--gray);text-align:center;line-height:1.5}
+.a01 .sns{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
+.sns .kakao{background:#fee500;color:#191919}
+.sns .google{background:#fff;color:#222;border:1px solid #d5d8de}
+.sns .apple{background:#111;color:#fff}
+
+/* A02 */
+.a02 h2{font-size:24px;line-height:1.35;white-space:pre-line;margin:8px 0 28px}
+.chk{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:2px solid #cfd3dc;color:#fff}
+.chk.on{background:var(--pink);border-color:var(--pink)}
+.all{display:flex;align-items:center;gap:12px;padding:18px 16px;border-radius:14px;background:var(--navy-soft);font-size:17px;font-weight:700;margin-bottom:12px}
+.term{background:rgba(255,255,255,.7);display:flex;align-items:center;gap:12px;padding:16px;font-size:15px;border-bottom:1px solid var(--line)}
+.term .req{color:var(--pink);font-weight:700;font-size:13px;margin-right:4px}
+.term .opt{color:var(--gray);font-weight:700;font-size:13px;margin-right:4px}
+.term .name{flex:1}
+.term .arrow{color:var(--gray);font-size:18px}
+
+/* A03-A08 */
+.prog{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.prog .bar{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--pink);border-radius:4px}
+.prog b{font-size:14px;color:var(--navy)}
+.pill{align-self:flex-start;padding:5px 12px;border-radius:12px;background:var(--navy-soft);font-size:12px;font-weight:700;margin-bottom:14px}
+.q h2{font-size:25px;line-height:1.4;margin-bottom:30px}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt-card{background:rgba(255,255,255,.88);display:flex;align-items:center;gap:12px;height:58px;padding:0 18px;border-radius:14px;border:1.5px solid var(--line);font-size:16px;font-weight:600}
+.opt-card.sel{border-color:var(--pink);background:var(--pink-soft);color:var(--navy)}
+.opt-card .dot{width:22px;height:22px;border-radius:50%;border:2px solid #cfd3dc;flex:none}
+.opt-card.sel .dot{border:6px solid var(--pink);background:#fff}
+.opts.ox{flex-direction:row}
+.opts.ox .opt-card{flex:1;height:130px;justify-content:center;font-size:44px;font-weight:800}
+.opts.ox .dot{display:none}
+
+/* A09 */
+.a09 h2{font-size:15px;color:var(--gray);font-weight:600;margin:8px 0 14px}
+.res-card{border-radius:22px;padding:28px 24px;background:linear-gradient(160deg,var(--navy),#27418a);color:#fff}
+.res-card .lab{font-size:13px;opacity:.75}
+.res-card .type{font-size:30px;font-weight:800;margin:6px 0 4px}
+.res-card .know{font-size:16px;font-weight:600;color:#ffd0e0}
+.gauge{display:flex;gap:6px;margin-top:22px}
+.gauge span{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.22)}
+.gauge span.on{background:var(--pink)}
+.gauge-l{display:flex;justify-content:space-between;font-size:10px;opacity:.7;margin-top:6px}
+.warn{margin-top:20px;padding:20px;border-radius:16px;background:var(--pink-soft);font-size:16px;line-height:1.55;font-weight:700}
+.warn em{font-style:normal;color:var(--pink)}
+
+/* A10 */
+.adm{position:relative;display:flex;height:100%}
+.side{width:200px;background:var(--navy);color:#fff;padding:22px 0}
+.side .brand{display:flex;align-items:center;gap:8px;padding:0 20px 10px;font-weight:800;font-size:14px}
+.side .brand img{height:26px;width:auto}
+.side .mi{padding:12px 20px;font-size:14px;color:rgba(255,255,255,.7)}
+.side .mi.act{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
+.main{flex:1;padding:24px 28px;min-width:0}
+.main h1{font-size:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:baseline}
+.main h1 small{font-size:12px;color:var(--gray);font-weight:500}
+.cards{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(20,39,90,.08)}
+.card h3{font-size:14px;margin-bottom:12px}
+.dist{display:flex;flex-direction:column;gap:7px}
+.dist .r{display:flex;align-items:center;gap:10px;font-size:12px}
+.dist .r .n{width:78px}
+.dist .r .t{flex:1;height:14px;background:var(--navy-soft);border-radius:7px;overflow:hidden}
+.dist .r .t i{display:block;height:100%;background:var(--navy);border-radius:7px}
+.dist .r .c{width:40px;text-align:right;font-weight:700}
+.rate{display:flex;flex-direction:column;justify-content:center;height:calc(100% - 26px)}
+.rate .big{font-size:44px;font-weight:800;color:var(--pink)}
+.rate .sub{font-size:12px;color:var(--gray);margin-top:2px}
+.rate .t{height:10px;border-radius:5px;background:var(--line);margin-top:12px;overflow:hidden}
+.rate .t i{display:block;height:100%;background:var(--pink)}
+table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+th{background:var(--navy-soft);font-weight:700;padding:6px 8px;text-align:left}
+th small{display:block;font-weight:500;color:var(--gray);font-size:10px}
+td{padding:0 8px;height:37px;border-bottom:1px solid var(--line)}
+td.bad{color:var(--red);font-weight:700}
+td .ok{color:var(--green);font-weight:700}
+td .no{color:var(--red);font-weight:700}
+/* E01~E06 */
+.e-title{font-size:24px;margin:6px 0 4px}
+.e-sub{font-size:13px;color:#5a6178;margin-bottom:12px}
+.e-card{background:#fff;border-radius:18px;padding:14px 12px}
+.e-take{margin-top:14px;padding:16px 18px;border-radius:16px;background:var(--pink-soft);font-size:15px;line-height:1.55;font-weight:700}
+.e-disc{font-size:10px;line-height:1.45;color:#5a6178;margin-bottom:8px}
+.e-note{font-size:11px;color:#5a6178;margin-top:8px;line-height:1.4}
+.e-notes{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.e-notes div{display:flex;justify-content:space-between;gap:8px;background:rgba(255,255,255,.88);border-radius:12px;padding:10px 12px;font-size:12px;font-weight:600}
+.e-notes b{white-space:nowrap}
+.e-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.e-term{background:#fff;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.e-term h3{font-size:17px}
+.e-term .tag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:9px;background:var(--pink-soft);color:var(--pink);font-size:10px;font-weight:700}
+.e-term p{font-size:12px;line-height:1.5;color:#3b4560}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;background:var(--navy-soft);font-weight:700}
+</style>
+</head>
+<body>
+<nav id="toc">
+  <h1>추가 화면 목차</h1>
+
+  <h2>A · 가입 · 투자성향 · 관리자</h2>
+  <ul>
+    <li><a href="#A01"><span class="id">A01</span>로그인</a></li>
+    <li><a href="#A02"><span class="id">A02</span>약관 동의</a></li>
+    <li><a href="#A03"><span class="id">A03</span>투자성향 질문 1</a></li>
+    <li><a href="#A04"><span class="id">A04</span>투자성향 질문 2</a></li>
+    <li><a href="#A05"><span class="id">A05</span>투자성향 질문 3</a></li>
+    <li><a href="#A06"><span class="id">A06</span>투자성향 질문 4</a></li>
+    <li><a href="#A07"><span class="id">A07</span>투자성향 질문 5</a></li>
+    <li><a href="#A08"><span class="id">A08</span>투자성향 질문 6</a></li>
+    <li><a href="#A09"><span class="id">A09</span>성향 결과</a></li>
+    <li><a href="#A10"><span class="id">A10</span>관리자 '투자자 정보' (PC)</a></li>
+  </ul>
+
+  <h2>E · ELS 설명</h2>
+  <ul>
+    <li><a href="#E01"><span class="id">E01</span>스텝다운 구조</a></li>
+    <li><a href="#E02"><span class="id">E02</span>만기 수익 구조</a></li>
+    <li><a href="#E03"><span class="id">E03</span>Worst-of 원리</a></li>
+    <li><a href="#E04"><span class="id">E04</span>3년 타임라인</a></li>
+    <li><a href="#E05"><span class="id">E05</span>예금과 비교</a></li>
+    <li><a href="#E06"><span class="id">E06</span>용어 카드</a></li>
+  </ul>
+</nav>
+<a id="back" href="#">← 목차</a>
+<div id="stage"></div>
+
+<script>
+/* ===== 모든 문구·수치·이미지 경로 ===== */
+const CONTENT = {
+  extra: {
+    logo: 'images/logo.png',
+    bgColor: '#F4C2C2',                          /* A02~A10 공통 배경색 */
+    bgColorA01: '#FFFFFF',                       /* A01만 흰색 */
+    bgColorA10: '#FFFFFF',                       /* A10(PC)만 흰색 */
+    chars: ['images/characters/male_default.png', 'images/characters/female_default.png'],
+    saved: '✓ 안전하게 저장되었습니다',
+    back: '← 목차',
+    A01: {
+      tagline: '배우자의 투자, 게임으로 먼저 경험해 보세요',
+      buttons: [
+        { cls: 'kakao',  mark: '💬', label: '카카오로 시작하기' },
+        { cls: 'google', mark: 'G',  label: 'Google로 시작하기' },
+        { cls: 'apple',  mark: '',  label: 'Apple로 시작하기' }
+      ]
+    },
+    A02: {
+      title: '서비스 이용을 위해\n약관에 동의해 주세요',
+      all: '전체 동의',
+      items: [
+        { req: true,  label: '이용약관' },
+        { req: true,  label: '개인정보 수집 및 이용' },
+        { req: true,  label: '투자성향 응답 통계 활용' },
+        { req: false, label: '마케팅 정보 수신' }
+      ],
+      reqTag: '[필수]', optTag: '[선택]',
+      button: '동의하고 계속'
+    },
+    quiz: {
+      next: '다음',
+      kinds: { tendency: '투자성향', knowledge: '투자지식' },
+      list: [
+        { kind: 'tendency',  q: '원금손실 가능 상품 투자 경험은?', opts: ['없음', '1년 미만', '1~3년', '3년 이상'], short: 'Q1|투자경험' },
+        { kind: 'tendency',  q: '이 돈을 얼마 동안 묶어 둘 수 있나요?', opts: ['1년 미만', '1~2년', '2~3년', '3년 이상'], short: 'Q2|투자기간' },
+        { kind: 'tendency',  q: '투자금이 20% 줄었다면?', opts: ['바로 판다', '불안하지만 기다린다', '더 산다', '잘 모르겠다'], short: 'Q3|손실반응' },
+        { kind: 'knowledge', q: 'ELS는 예금자보호 대상이다', opts: ['O', 'X'], ox: true, answer: 1, short: 'Q4|예금자보호' },
+        { kind: 'knowledge', q: '금리가 오르면 이미 발행된 채권 가격은?', opts: ['오른다', '내린다', '그대로다', '모르겠다'], answer: 1, short: 'Q5|금리·채권' },
+        { kind: 'knowledge', q: '원금비보장 상품의 최대 손실은?', opts: ['10%', '30%', '50%', '원금 전액'], answer: 3, short: 'Q6|최대손실' }
+      ],
+      sample: [2, 2, 1, 1, 1, 2]   /* A03~A08에서 선택된 상태 (A10 표 1행과 동일) */
+    },
+    A09: {
+      head: '나의 투자성향 결과',
+      label: '투자성향',
+      type: '위험중립형',
+      know: '기초지식 2/3점',
+      levels: ['안정형', '안정추구형', '위험중립형', '적극투자형', '공격투자형'],
+      levelOn: 2,
+      warn: 'ELS는 매우 높은 위험 상품이에요.\n게임에서 먼저 경험해 보세요!',
+      warnEm: '매우 높은 위험',
+      button: '게임 시작하기'
+    },
+    A10: {
+      brand: '탕진잼 관리자',
+      menu: ['대시보드', '투자자 정보', '퀴즈 결과', '설정'],
+      menuOn: 1,
+      title: '투자자 정보',
+      note: '예시 데이터 · 가상',
+      distTitle: '투자성향 분포',
+      distUnit: '명',
+      rateTitle: 'ELS 퀴즈 정답률',
+      rateSub: (c, n) => n + '명 중 ' + c + '명 정답',
+      tableTitle: '가입자 목록',
+      cols: ['번호', '가입일', '로그인', '성향', 'ELS 퀴즈'],
+      correct: '정답', wrong: '오답',
+      /* a: Q1~Q6 선택 보기 인덱스 */
+      rows: [
+        { date: '2026-11-03', login: '카카오', a: [2, 2, 1, 1, 1, 2], type: '위험중립형', quiz: true },
+        { date: '2026-11-04', login: 'Google', a: [0, 0, 0, 0, 0, 0], type: '안정형',     quiz: false },
+        { date: '2026-11-05', login: '카카오', a: [3, 3, 2, 1, 1, 3], type: '공격투자형', quiz: true },
+        { date: '2026-11-07', login: 'Apple',  a: [1, 1, 1, 0, 1, 1], type: '안정추구형', quiz: false },
+        { date: '2026-11-08', login: '카카오', a: [2, 2, 1, 1, 0, 3], type: '위험중립형', quiz: true },
+        { date: '2026-11-10', login: 'Google', a: [2, 1, 1, 1, 1, 2], type: '위험중립형', quiz: true },
+        { date: '2026-11-11', login: '카카오', a: [3, 2, 2, 1, 1, 3], type: '적극투자형', quiz: true },
+        { date: '2026-11-13', login: 'Apple',  a: [1, 0, 0, 0, 2, 0], type: '안정형',     quiz: false },
+        { date: '2026-11-14', login: '카카오', a: [2, 3, 3, 1, 1, 3], type: '적극투자형', quiz: true },
+        { date: '2026-11-16', login: 'Google', a: [1, 2, 1, 0, 1, 2], type: '안정추구형', quiz: false }
+      ]
+    },
+
+    /* ===== E01~E06 투자교육 자료 (수치는 PRD 4·5장 / 10장) ===== */
+    E: {
+      disclaimer: '본 화면은 실제 상품을 교육 목적으로 단순화·재구성한 가상 시나리오이며, 실제 상품 조건 및 수익과 다릅니다. 투자 권유가 아닙니다.',
+      E01: {
+        title: '스텝다운 구조',
+        sub: '평가일마다 상환 기준이 계단처럼 내려가요',
+        years: ['1년차', '2년차', '3년차(만기)'],
+        thresholds: [85, 80, 70],
+        zoneUp: '상환 구간', zoneDown: '미상환',
+        base: '최초기준가 100%',
+        take: '기준 이상이면 원금 + 수익을 받고 끝나요.\n기준이 낮아질수록 상환 문턱도 낮아져요.'
+      },
+      E02: {
+        title: '만기 수익 구조',
+        sub: '만기 때 가장 약한 지수가 70%를 넘느냐가 전부예요',
+        profit: 31.2, line: 70,
+        yTitle: '수익률(%)', xTitle: '만기 시 최저 지수(%)',
+        profitLabel: '+31.2%', slopeLabel: '수익률 = 지수 − 100',
+        callout: ['1%p 차이로', '천국과 지옥'],
+        take: '70%에서 수익률이 −30%에서 +31.2%로 한 번에 바뀌어요.'
+      },
+      E03: {
+        title: 'Worst-of 원리',
+        sub: '3개 지수 중 가장 약한 지수 하나로 판정해요 (만기 시점)',
+        items: [
+          { name: 'S&P500', v: 95 },
+          { name: '유로스톡50', v: 80 },
+          { name: '코스피200', v: 71.5 }
+        ],
+        line: 70, lineLabel: '상환 기준 70%',
+        pick: '이 지수 하나로 결정',
+        take: '두 지수가 아무리 올라도 가장 낮은 71.5%만 봐요.\n70% 이상이라 턱걸이로 상환돼요.'
+      },
+      E04: {
+        title: '3년 타임라인',
+        sub: '세 번 모두 코스피200이 가장 약한 지수였어요',
+        points: ['가입', '1년', '2년', '3년'],
+        series: [
+          { name: '유로스톡50', color: '#f2a33a', v: [100, 88, 72, 80] },
+          { name: 'S&P500',    color: '#5b7fd6', v: [100, 90, 86, 95] },
+          { name: '코스피200', color: '#ff5c93', v: [100, 79, 61, 71.5], worst: true }
+        ],
+        baseName: '상환 기준',
+        thresholds: [85, 80, 70],
+        events: ['📦', '🛢️', '🚀'],
+        notes: [
+          { icon: '📦', text: '관세 · 최저 79% < 기준 85%', verdict: '❌ 조기상환 실패' },
+          { icon: '🛢️', text: '전쟁 · 최저 61% < 기준 80%', verdict: '❌ 조기상환 실패' },
+          { icon: '🚀', text: '반도체 · 최저 71.5% ≥ 기준 70%', verdict: '✅ 턱걸이 상환' }
+        ]
+      },
+      E05: {
+        title: '예금과 비교',
+        sub: '700만 원을 3년 맡겼다면',
+        unit: '만 원',
+        bars: [
+          { label: ['예금', '(연 3% 가정)'], v: 63, color: '#8fa0c4', text: '+63만', assume: true },
+          { label: ['ELS 상환', ''], v: 218.4, color: '#1f9d6b', text: '+218.4만' },
+          { label: ['ELS 만기', '지수 60% 가정'], v: -280, color: '#e5484d', text: '−280만', assume: true }
+        ],
+        assumeTag: '가정',
+        note: '※ 점선 막대는 비교를 위한 가정입니다 (예금 연 3%, ELS 만기 지수 60%).',
+        take: '수익은 최대 +31.2%로 정해져 있지만,\n손실은 원금까지 갈 수 있어요.'
+      },
+      E06: {
+        title: '용어 카드',
+        sub: 'ELS를 이해하는 네 가지 키워드',
+        cards: [
+          { icon: 'step', term: '스텝다운', desc: '평가일마다 상환 기준이 계단처럼 내려가요. (85 → 80 → 70%)' },
+          { icon: 'early', term: '조기상환', desc: '기준을 넘으면 만기 전에 원금 + 수익을 받고 끝나요.' },
+          { icon: 'worst', term: 'Worst-of', desc: '여러 지수 중 가장 많이 떨어진 지수 하나로 판정해요.' },
+          { icon: 'ki', term: '낙인', tag: '실제 상품 40%', desc: '실제 상품은 한 번이라도 40% 밑으로 떨어지면 원금 손실 구간이에요. (게임에서는 제외)' }
+        ]
+      }
+    }
+  }
+};
+const X = CONTENT.extra;
+
+/* ===== 헬퍼 ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function logoImg(){
+  const fb = '<div class="ph">' + X.logo + '</div>';
+  return '<img src="' + X.logo + '" alt="logo" onerror="this.outerHTML=this.dataset.fb" data-fb="' + fb.replace(/"/g, '&quot;') + '">';
+}
+function charsHtml(){
+  return '<div class="chars"><div class="in">' + X.chars.map(src => {
+    const fb = '<div class="ph">' + src + '</div>';
+    return '<img src="' + src + '" alt="" onerror="this.outerHTML=this.dataset.fb" data-fb="' + fb.replace(/"/g, '&quot;') + '">';
+  }).join('') + '</div></div>';
+}
+const bgStyle = color => ' style="background:' + (color || X.bgColor) + '"';
+const phone = (inner, color) => '<div class="phone"' + bgStyle(color) + '>' + inner + '<div class="save">' + esc(X.saved) + '</div></div>';
+
+/* ===== 화면 ===== */
+const SCREENS = {};
+
+SCREENS.A01 = () => {
+  const c = X.A01;
+  return phone('<div class="scr a01">' +
+    '<div class="logo-wrap">' + logoImg() + '<div class="tag">' + esc(c.tagline) + '</div></div>' + charsHtml() +
+    '<div class="sns">' + c.buttons.map(b => '<div class="btn ' + b.cls + '"><span>' + esc(b.mark) + '</span>' + esc(b.label) + '</div>').join('') + '</div>' +
+    '</div>', X.bgColorA01);
+};
+
+SCREENS.A02 = () => {
+  const c = X.A02, chk = '<div class="chk on">✓</div>';
+  return phone('<div class="scr a02">' +
+    '<h2>' + esc(c.title) + '</h2>' +
+    '<div class="all">' + chk + esc(c.all) + '</div>' +
+    c.items.map(i => '<div class="term">' + chk + '<div class="name"><span class="' + (i.req ? 'req' : 'opt') + '">' + esc(i.req ? c.reqTag : c.optTag) + '</span>' + esc(i.label) + '</div><span class="arrow">›</span></div>').join('') +
+    charsHtml() + '<div class="btn pink">' + esc(c.button) + '</div></div>');
+};
+
+function quizScreen(n){
+  const Q = X.quiz, q = Q.list[n], sel = Q.sample[n];
+  return phone('<div class="scr q">' +
+    '<div class="prog"><div class="bar"><i style="width:' + ((n + 1) / Q.list.length * 100) + '%"></i></div><b>' + (n + 1) + ' / ' + Q.list.length + '</b></div>' +
+    '<div class="pill">' + esc(Q.kinds[q.kind]) + '</div>' +
+    '<h2>' + esc(q.q) + '</h2>' +
+    '<div class="opts' + (q.ox ? ' ox' : '') + '">' +
+      q.opts.map((o, i) => '<div class="opt-card' + (i === sel ? ' sel' : '') + '"><span class="dot"></span>' + esc(o) + '</div>').join('') +
+    '</div>' + charsHtml() + '<div class="btn pink">' + esc(Q.next) + '</div></div>');
+}
+for (let i = 0; i < 6; i++) SCREENS['A0' + (3 + i)] = () => quizScreen(i);
+
+SCREENS.A09 = () => {
+  const c = X.A09;
+  return phone('<div class="scr a09">' +
+    '<h2>' + esc(c.head) + '</h2>' +
+    '<div class="res-card"><div class="lab">' + esc(c.label) + '</div><div class="type">' + esc(c.type) + '</div><div class="know">' + esc(c.know) + '</div>' +
+      '<div class="gauge">' + c.levels.map((l, i) => '<span class="' + (i <= c.levelOn ? 'on' : '') + '"></span>').join('') + '</div>' +
+      '<div class="gauge-l"><span>' + esc(c.levels[0]) + '</span><span>' + esc(c.levels[c.levels.length - 1]) + '</span></div></div>' +
+    '<div class="warn">' + esc(c.warn).replace(esc(c.warnEm), '<em>' + esc(c.warnEm) + '</em>').replace('\n', '<br>') + '</div>' +
+    charsHtml() + '<div class="btn pink">' + esc(c.button) + '</div></div>');
+};
+
+SCREENS.A10 = () => {
+  const c = X.A10, Q = X.quiz.list, rows = c.rows, levels = X.A09.levels;
+  const cnt = levels.map(l => rows.filter(r => r.type === l).length);
+  const max = Math.max(...cnt, 1);
+  const okN = rows.filter(r => r.quiz).length, pct = Math.round(okN / rows.length * 100);
+  const head = '<tr><th>' + c.cols[0] + '</th><th>' + c.cols[1] + '</th><th>' + c.cols[2] + '</th>' +
+    Q.map(q => { const p = q.short.split('|'); return '<th>' + p[0] + '<small>' + p[1] + '</small></th>'; }).join('') +
+    '<th>' + c.cols[3] + '</th><th>' + c.cols[4] + '</th></tr>';
+  const body = rows.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + r.date + '</td><td>' + esc(r.login) + '</td>' +
+    r.a.map((a, k) => '<td' + (Q[k].answer !== undefined && Q[k].answer !== a ? ' class="bad"' : '') + '>' + esc(Q[k].opts[a]) + '</td>').join('') +
+    '<td><span class="badge">' + esc(r.type) + '</span></td><td>' + (r.quiz ? '<span class="ok">● ' + esc(c.correct) + '</span>' : '<span class="no">● ' + esc(c.wrong) + '</span>') + '</td></tr>').join('');
+  return '<div class="pc"' + bgStyle(X.bgColorA10) + '><div class="adm">' +
+    '<div class="side"><div class="brand">' + logoImg() + '</div><div class="brand">' + esc(c.brand) + '</div>' +
+      c.menu.map((m, i) => '<div class="mi' + (i === c.menuOn ? ' act' : '') + '">' + esc(m) + '</div>').join('') + charsHtml() + '</div>' +
+    '<div class="main"><h1>' + esc(c.title) + '<small>' + esc(c.note) + '</small></h1>' +
+      '<div class="cards">' +
+        '<div class="card"><h3>' + esc(c.distTitle) + '</h3><div class="dist">' +
+          levels.map((l, i) => '<div class="r"><span class="n">' + esc(l) + '</span><span class="t"><i style="width:' + (cnt[i] / max * 100) + '%"></i></span><span class="c">' + cnt[i] + esc(c.distUnit) + '</span></div>').join('') + '</div></div>' +
+        '<div class="card"><h3>' + esc(c.rateTitle) + '</h3><div class="rate"><div class="big">' + pct + '%</div><div class="sub">' + esc(c.rateSub(okN, rows.length)) + '</div><div class="t"><i style="width:' + pct + '%"></i></div></div></div>' +
+      '</div>' +
+      '<div class="card" style="padding:14px 20px"><h3>' + esc(c.tableTitle) + '</h3><table>' + head + body + '</table></div>' +
+    '</div></div></div>';
+};
+
+/* ===== E01~E06 ===== */
+const E = X.E;
+const NAVY = '#14275a', PINK = '#ff5c93', GREEN = '#1f9d6b', GRAY = '#8a8f99', RED = '#e5484d';
+const svgBox = (h, inner) => '<svg viewBox="0 0 318 ' + h + '" width="100%" style="display:block">' + inner + '</svg>';
+const tx = (x, y, t, o) => { o = o || {}; return '<text x="' + x + '" y="' + y + '" font-size="' + (o.s || 10) + '" fill="' + (o.c || NAVY) + '" text-anchor="' + (o.a || 'middle') + '" font-weight="' + (o.w || 400) + '">' + t + '</text>'; };
+const ln = (x1, y1, x2, y2, c, w, d) => '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + c + '" stroke-width="' + (w || 1) + '"' + (d ? ' stroke-dasharray="' + d + '"' : '') + ' stroke-linecap="round"/>';
+const br = t => esc(t).replace(/\n/g, '<br>');
+function eScreen(c, body, disc){
+  return phone('<div class="scr e"><h2 class="e-title">' + esc(c.title) + '</h2><div class="e-sub">' + esc(c.sub) + '</div>' + body +
+    (c.take ? '<div class="e-take">' + br(c.take) + '</div>' : '') +
+    '<div class="sp"></div>' + (disc ? '<div class="e-disc">' + esc(E.disclaimer) + '</div>' : '') + '</div>');
+}
+
+SCREENS.E01 = () => {
+  const c = E.E01, t = c.thresholds, y = v => 16 + (110 - v) * 3.3;
+  let s = '<path d="M44,16 H308 V' + y(t[2]) + ' H220 V' + y(t[1]) + ' H132 V' + y(t[0]) + ' H44 Z" fill="#d9f2e6"/>' +
+          '<path d="M44,' + y(t[0]) + ' H132 V' + y(t[1]) + ' H220 V' + y(t[2]) + ' H308 V214 H44 Z" fill="#eceef2"/>';
+  [90, 80, 70, 60].forEach(v => { s += ln(44, y(v), 308, y(v), '#fff', 1) + tx(38, y(v) + 3, v, { a: 'end', s: 9, c: GRAY }); });
+  s += ln(44, y(100), 308, y(100), GRAY, 1, '4 3') + tx(38, y(100) + 3, 100, { a: 'end', s: 9, c: GRAY }) + tx(176, y(100) - 4, esc(c.base), { s: 9, c: GRAY });
+  s += '<path d="M44,' + y(t[0]) + ' H132 V' + y(t[1]) + ' H220 V' + y(t[2]) + ' H308" fill="none" stroke="' + GREEN + '" stroke-width="3" stroke-linejoin="round"/>';
+  [88, 176, 264].forEach((x, i) => { s += tx(x, y(t[i]) - 7, t[i] + '%', { s: 12, w: 800, c: GREEN }) + tx(x, 232, esc(c.years[i]), { s: 11, w: 600 }); });
+  s += tx(176, 32, esc(c.zoneUp), { s: 12, w: 700, c: GREEN }) + tx(176, 196, esc(c.zoneDown), { s: 12, w: 700, c: GRAY });
+  return eScreen(c, '<div class="e-card">' + svgBox(244, s) + '</div>');
+};
+
+SCREENS.E02 = () => {
+  const c = E.E02, p = c.profit, L = c.line;
+  const x = v => 40 + v / 120 * 268, y = r => 24 + (40 - r) / 140 * 190;
+  let s = ln(40, 24, 40, 214, '#c8ccd6', 1) + ln(40, 214, 308, 214, '#c8ccd6', 1) +
+          ln(40, y(0), 308, y(0), '#c8ccd6', 1, '4 3') + tx(34, y(0) + 3, 0, { a: 'end', s: 9, c: GRAY }) +
+          tx(34, y(-50) + 3, '-50', { a: 'end', s: 9, c: GRAY }) + tx(34, y(-100) + 3, '-100', { a: 'end', s: 9, c: GRAY }) +
+          tx(40, 12, esc(c.yTitle), { a: 'start', s: 9, c: GRAY });
+  [0, 40, L, 100, 120].forEach(v => { s += tx(x(v), 228, v, { s: 10, c: v === L ? PINK : NAVY, w: v === L ? 800 : 400 }); });
+  s += tx(174, 246, esc(c.xTitle), { s: 9, c: GRAY });
+  s += ln(x(L), y(L - 100), x(L), y(p), PINK, 2, '4 3');
+  s += ln(x(0), y(-100), x(L), y(L - 100), RED, 3) + ln(x(L), y(p), x(120), y(p), GREEN, 3);
+  s += '<circle cx="' + x(L) + '" cy="' + y(L - 100) + '" r="4.5" fill="#fff" stroke="' + RED + '" stroke-width="2.5"/>' +
+       '<circle cx="' + x(L) + '" cy="' + y(p) + '" r="4.5" fill="' + GREEN + '"/>';
+  s += tx((x(L) + x(120)) / 2, y(p) - 8, esc(c.profitLabel), { s: 13, w: 800, c: GREEN });
+  s += tx(128, 198, esc(c.slopeLabel), { s: 9, c: RED });
+  s += '<rect x="54" y="44" width="118" height="42" rx="10" fill="' + PINK + '"/>' +
+       tx(113, 61, esc(c.callout[0]), { s: 12, w: 800, c: '#fff' }) + tx(113, 77, esc(c.callout[1]), { s: 12, w: 800, c: '#fff' }) +
+       ln(172, 66, x(L) - 6, 78, PINK, 2);
+  return eScreen(c, '<div class="e-card">' + svgBox(252, s) + '</div>');
+};
+
+SCREENS.E03 = () => {
+  const c = E.E03, X0 = 96, k = 2.04, ys = [50, 100, 150], min = Math.min(...c.items.map(i => i.v));
+  let s = ln(X0, 28, X0, 168, '#c8ccd6', 1);
+  c.items.forEach((it, i) => {
+    const w = it.v * k, m = it.v === min;
+    s += tx(90, ys[i] + 4, esc(it.name), { a: 'end', s: 11, w: 600 }) +
+         '<rect x="' + X0 + '" y="' + (ys[i] - 15) + '" width="' + w + '" height="30" rx="6" fill="' + (m ? NAVY : '#c5cde0') + '"/>' +
+         tx(X0 + w - 8, ys[i] + 5, it.v + '%', { a: 'end', s: 12, w: 800, c: m ? '#fff' : NAVY });
+  });
+  const lx = X0 + c.line * k;
+  s += ln(lx, 24, lx, 172, PINK, 2, '4 3') + tx(lx, 14, esc(c.lineLabel), { s: 9, w: 700, c: PINK });
+  s += tx(X0 + min * k / 2, 198, '▲ ' + esc(c.pick), { s: 13, w: 800, c: PINK });
+  return eScreen(c, '<div class="e-card">' + svgBox(210, s) + '</div>');
+};
+
+SCREENS.E04 = () => {
+  const c = E.E04, px = [50, 132, 214, 296], y = v => 30 + (110 - v) * 2.833, t = c.thresholds;
+  let s = '';
+  [100, 90, 80, 70, 60].forEach(v => { s += ln(36, y(v), 308, y(v), '#eceef2', 1) + tx(30, y(v) + 3, v, { a: 'end', s: 9, c: GRAY }); });
+  s += '<polyline points="' + t.map((v, i) => px[i + 1] + ',' + y(v)).join(' ') + '" fill="none" stroke="' + GRAY + '" stroke-width="2" stroke-dasharray="5 4"/>';
+  t.forEach((v, i) => { s += '<rect x="' + (px[i + 1] - 4) + '" y="' + (y(v) - 4) + '" width="8" height="8" fill="' + GRAY + '"/>' + tx(px[i + 1] + 10, y(v) - 7, v, { a: 'start', s: 9, c: GRAY }); });
+  c.series.forEach(se => {
+    const w = se.worst ? 3.5 : 2;
+    s += '<polyline points="' + se.v.map((v, i) => px[i] + ',' + y(v)).join(' ') + '" fill="none" stroke="' + se.color + '" stroke-width="' + w + '" stroke-linejoin="round"/>';
+    se.v.forEach((v, i) => { s += '<circle cx="' + px[i] + '" cy="' + y(v) + '" r="' + (se.worst ? 4.5 : 3) + '" fill="' + se.color + '"/>'; });
+    if (se.worst) se.v.forEach((v, i) => { if (i) s += tx(px[i], y(v) + 16, v, { s: 10, w: 800, c: PINK }); });
+  });
+  c.events.forEach((e, i) => { s += tx(px[i + 1], 20, e, { s: 15 }); });
+  c.points.forEach((p, i) => { s += tx(px[i], 218, esc(p), { s: 11, w: 600 }); });
+  const lg = [[12, c.series[0]], [96, c.series[1]], [168, c.series[2]]];
+  lg.forEach(([x, se]) => { s += ln(x, 244, x + 14, 244, se.color, 3) + tx(x + 19, 247, esc(se.name), { a: 'start', s: 9 }); });
+  s += ln(246, 244, 260, 244, GRAY, 2, '4 3') + tx(265, 247, esc(c.baseName), { a: 'start', s: 9 });
+  const notes = '<div class="e-notes">' + c.notes.map(n => '<div><span>' + n.icon + ' ' + esc(n.text) + '</span><b>' + esc(n.verdict) + '</b></div>').join('') + '</div>';
+  return eScreen(c, '<div class="e-card">' + svgBox(256, s) + '</div>' + notes);
+};
+
+SCREENS.E05 = () => {
+  const c = E.E05, y = v => 24 + (250 - v) * 0.3455, cx = [66, 160, 254];
+  let s = ln(20, y(0), 308, y(0), '#9aa1b2', 1.5);
+  c.bars.forEach((b, i) => {
+    const top = b.v >= 0 ? y(b.v) : y(0), h = Math.abs(y(b.v) - y(0));
+    s += '<rect x="' + (cx[i] - 28) + '" y="' + top + '" width="56" height="' + h + '" rx="5" fill="' + b.color + '"' +
+         (b.assume ? ' fill-opacity=".35" stroke="' + b.color + '" stroke-width="2" stroke-dasharray="4 3"' : '') + '/>';
+    const ty = b.v >= 0 ? top - 7 : top + h + 14;
+    s += tx(cx[i], ty, esc(b.text) + (b.assume ? ' (' + esc(c.assumeTag) + ')' : ''), { s: 11, w: 800, c: b.color });
+    s += tx(cx[i], 240, esc(b.label[0]), { s: 10, w: 600 }) + (b.label[1] ? tx(cx[i], 252, esc(b.label[1]), { s: 9, c: GRAY }) : '');
+  });
+  return eScreen(c, '<div class="e-card">' + svgBox(262, s) + '<div class="e-note">' + esc(c.note) + '</div></div>', true);
+};
+
+SCREENS.E06 = () => {
+  const c = E.E06, ic = {
+    step:  '<path d="M4 10 H14 V18 H22 V26 H32" fill="none" stroke="#1f9d6b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>',
+    early: '<circle cx="18" cy="18" r="14" fill="#d9f2e6"/><path d="M11 18 l5 5 l9 -10" fill="none" stroke="#1f9d6b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+    worst: '<rect x="5" y="8" width="26" height="6" rx="3" fill="#c5cde0"/><rect x="5" y="16" width="20" height="6" rx="3" fill="#c5cde0"/><rect x="5" y="24" width="14" height="6" rx="3" fill="#14275a"/>',
+    ki:    '<path d="M18 4 L33 31 H3 Z" fill="#ffe3ec" stroke="#e5484d" stroke-width="2.5" stroke-linejoin="round"/><path d="M18 14 V23" stroke="#e5484d" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="27" r="1.8" fill="#e5484d"/>'
+  };
+  const grid = '<div class="e-grid">' + c.cards.map(k => '<div class="e-term"><svg viewBox="0 0 36 36" width="36" height="36">' + ic[k.icon] + '</svg>' +
+    '<h3>' + esc(k.term) + (k.tag ? '<span class="tag">' + esc(k.tag) + '</span>' : '') + '</h3><p>' + esc(k.desc) + '</p></div>').join('') + '</div>';
+  return eScreen(c, grid, true);
+};
+
+/* ===== 라우팅 ===== */
+const capture = /capture=1/.test(location.search + location.hash);
+document.body.classList.toggle('capture', capture);
+$('#back').textContent = X.back;
+
+function fit(){
+  const el = $('#stage > *'); if (!el) return;
+  const pc = el.classList.contains('pc');
+  if (!pc && innerWidth <= 430) { el.style.transform = ''; return; }
+  const w = pc ? 1440 : 410, h = pc ? 900 : 864;
+  el.style.transform = 'scale(' + Math.min(1, innerWidth / w, innerHeight / h) + ')';
+}
+function route(){
+  const id = location.hash.slice(1).split('?')[0].toUpperCase();
+  const ok = !!SCREENS[id];
+  document.body.classList.toggle('view', ok);
+  $('#stage').innerHTML = ok ? SCREENS[id]() : '';
+  document.title = ok ? id + ' · 내 배우자는 탕진잼' : '추가 화면 · 내 배우자는 탕진잼';
+  fit();
+}
+addEventListener('hashchange', route);
+addEventListener('resize', fit);
+route();
+</script>
+</body>
+</html>

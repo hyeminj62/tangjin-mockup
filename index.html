@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>내 배우자는 탕진잼</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --pink:#ff5c93; --pink-soft:#ffe3ec; --navy:#14275a; --navy-soft:#e8ecf6;
+  --gray:#8a8f99; --line:#e6e8ee;
+  --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#e9ecf3;font-family:var(--font);color:var(--navy)}
+body{display:flex;align-items:center;justify-content:center}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+/* ===== 폰 프레임 ===== */
+.phone{
+  position:relative;width:390px;height:844px;flex:none;overflow:hidden;
+  background:#fff;border-radius:44px;border:10px solid #1b1d24;
+  box-shadow:0 24px 60px rgba(20,39,90,.28);
+  transform-origin:center center;
+  /* border 포함 크기가 390x844가 되도록 */
+  box-sizing:content-box;
+}
+@media (max-width:430px){
+  html,body{background:#fff}
+  .phone{width:100vw;height:100vh;height:100dvh;border:0;border-radius:0;box-shadow:none;transform:none!important}
+}
+
+/* ===== 화면 / 전환 ===== */
+.stage{position:absolute;inset:0;overflow:hidden}
+.screen{position:absolute;inset:0;overflow:hidden;opacity:0}
+.screen.in-fwd{animation:inFwd .35s ease forwards}
+.screen.in-back{animation:inBack .35s ease forwards}
+.screen.in-fade{animation:inFade .3s ease forwards}
+.screen.out{animation:outFade .35s ease forwards;pointer-events:none}
+.screen.no-anim{opacity:1}
+@keyframes inFwd{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes inBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes inFade{from{opacity:0}to{opacity:1}}
+@keyframes outFade{from{opacity:1}to{opacity:0}}
+
+/* ===== 이미지 / 플레이스홀더 ===== */
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.bg.blur{filter:blur(7px);transform:scale(1.08)}
+.ph,.char.ph,.bg.ph{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  background:#cfd2d9;color:#555a66;font-size:11px;line-height:1.4;word-break:break-all;padding:8px;
+}
+.ph::before{content:"🖼 ";}
+.char{position:absolute;display:block;height:520px;aspect-ratio:7/10;object-fit:contain;object-position:bottom;pointer-events:none}
+
+/* ===== 상단 내비 ===== */
+.nav{position:absolute;top:12px;left:12px;right:12px;z-index:30;display:flex;justify-content:space-between;pointer-events:none}
+.nav button{
+  pointer-events:auto;height:34px;padding:0 14px;border-radius:17px;font-size:13px;font-weight:600;
+  background:rgba(255,255,255,.88);color:var(--navy);box-shadow:0 2px 8px rgba(20,39,90,.12);
+  backdrop-filter:blur(6px);transition:transform .1s;
+}
+.nav button:active{transform:scale(.95)}
+.nav.hide{display:none}
+.nav .back{font-size:18px;padding:0 14px 2px;line-height:34px}
+
+/* ===== 저장 표시 ===== */
+.save{
+  position:absolute;left:0;right:0;bottom:8px;z-index:40;text-align:center;
+  font-size:11px;color:var(--gray);pointer-events:none;opacity:0;transition:opacity .6s ease;
+  text-shadow:0 0 4px #fff,0 0 4px #fff;
+}
+.save.show{opacity:1;transition:opacity .15s ease}
+
+/* ===== 토스트 ===== */
+.toast{
+  position:absolute;left:24px;right:24px;bottom:70px;z-index:50;padding:13px 16px;border-radius:14px;
+  background:rgba(20,39,90,.94);color:#fff;font-size:14px;font-weight:500;text-align:center;line-height:1.45;
+  opacity:0;transform:translateY(24px);transition:opacity .3s,transform .3s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:none}
+
+/* ===== 말풍선 ===== */
+.bubble{
+  position:absolute;left:14px;right:14px;bottom:30px;z-index:20;min-height:112px;
+  background:#fff;border-radius:22px;padding:30px 20px 24px;
+  box-shadow:0 8px 24px rgba(20,39,90,.22);border:2px solid var(--navy-soft);
+  cursor:pointer;user-select:none;
+}
+.bubble .name{
+  position:absolute;top:-14px;left:18px;background:var(--pink);color:#fff;font-size:13px;font-weight:700;
+  padding:5px 14px;border-radius:14px;box-shadow:0 3px 8px rgba(255,92,147,.4);
+}
+.bubble .txt{font-size:16px;line-height:1.6;font-weight:500;color:var(--navy);min-height:51px;word-break:keep-all}
+.bubble .txt b{color:var(--pink);font-weight:800}
+.bubble .arrow{position:absolute;right:16px;bottom:8px;font-size:13px;color:var(--pink);opacity:0}
+.bubble.done .arrow{opacity:1;animation:blink 1s infinite}
+.bubble.narr{background:rgba(20,39,90,.92);border-color:rgba(255,255,255,.15)}
+.bubble.narr .txt{color:#fff}
+.bubble.narr .txt b{color:#ffb3cc}
+.bubble.narr .arrow{color:#ffb3cc}
+.bubble.narr{padding-top:24px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ===== 공통 버튼 / 카드 ===== */
+.btn{
+  display:block;width:100%;padding:17px 16px;border-radius:16px;font-size:17px;font-weight:700;
+  transition:transform .1s,box-shadow .2s;
+}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,#ff6b9d,#ff4d85);color:#fff;box-shadow:0 8px 18px rgba(255,92,147,.38)}
+.btn.navy{background:var(--navy);color:#fff;box-shadow:0 8px 18px rgba(20,39,90,.3)}
+.btn.ghost{background:#fff;color:var(--navy);border:2px solid var(--navy-soft);box-shadow:0 4px 12px rgba(20,39,90,.1)}
+.card{background:rgba(255,255,255,.94);border-radius:24px;padding:24px 22px;box-shadow:0 10px 30px rgba(20,39,90,.18)}
+
+/* ===== S00 ===== */
+.veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.25) 50%,rgba(255,255,255,.7))}
+/* logo.png 는 사방에 투명 여백이 커서(보이는 부분 가로 약 59%) 이미지 박스를 화면보다 넓게 잡아야 크게 보인다. 이미지 자체는 자르거나 변형하지 않음 */
+.s00 .logo{position:absolute;top:36px;left:0;right:0;display:flex;justify-content:center}
+.s00 .logo img,.s00 .logo .ph{display:block;flex:none;width:130%;height:auto;aspect-ratio:1408/768;object-fit:contain}
+.s00 .ask{position:absolute;top:312px;left:0;right:0;text-align:center;font-size:19px;font-weight:700}
+.s00 .cards{position:absolute;top:366px;left:18px;right:18px;display:flex;gap:12px}
+.pick{
+  flex:1;background:rgba(255,255,255,.95);border-radius:22px;overflow:hidden;
+  box-shadow:0 10px 26px rgba(20,39,90,.2);border:3px solid transparent;
+  transition:transform .15s,border-color .15s;display:flex;flex-direction:column;
+}
+.pick:hover{border-color:var(--pink);transform:translateY(-4px)}
+.pick:active{transform:scale(.97)}
+.pick .thumb{height:230px;background:linear-gradient(180deg,var(--pink-soft),#fff);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.pick .thumb img,.pick .thumb .ph{height:225px;width:auto;aspect-ratio:7/10;object-fit:contain;object-position:bottom}
+.pick .label{padding:14px 6px 16px;font-size:16px;font-weight:800;color:var(--navy)}
+.pick .label small{display:block;font-size:12px;font-weight:600;color:var(--pink);margin-bottom:2px}
+
+/* ===== S02 ===== */
+.s02 .q{position:absolute;top:96px;left:24px;right:24px;text-align:center;font-size:27px;font-weight:800;line-height:1.35;text-shadow:0 2px 0 #fff}
+.s02 .opts{position:absolute;top:210px;left:24px;right:24px;display:flex;flex-direction:column;gap:12px;z-index:5}
+
+/* ===== S03 ===== */
+.s03 .wrap{position:absolute;left:22px;right:22px;top:200px}
+.s03 .card h2{font-size:23px;line-height:1.4;font-weight:600;text-align:center;margin-bottom:14px}
+.s03 .card h2 b{color:var(--pink);font-weight:900}
+.s03 .card p{font-size:15.5px;line-height:1.7;color:#3a4566;text-align:center;word-break:keep-all}
+.s03 .badge{display:block;width:max-content;margin:0 auto 14px;background:var(--navy-soft);color:var(--navy);font-weight:700;font-size:12px;padding:5px 12px;border-radius:12px}
+.s03 .row{display:flex;gap:12px;margin-top:16px}
+
+/* ===== 계단 도식 (S04, S05 공용) ===== */
+.stairs{display:flex;align-items:flex-end;justify-content:center;gap:14px;padding-top:4px}
+.stairs .st{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center}
+.stairs .pct{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:3px}
+.stairs .bar{width:100%;border-radius:8px 8px 3px 3px;background:var(--navy);transform-origin:bottom;animation:grow .6s ease both}
+.stairs .st:nth-child(2) .bar{animation-delay:.12s}
+.stairs .st:nth-child(3) .bar{animation-delay:.24s}
+.stairs .st.last .bar{background:var(--pink)}
+.stairs .st.last .pct{color:var(--pink)}
+.stairs .lb{font-size:12px;font-weight:600;color:var(--gray);margin-top:5px}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* ===== S04 증권앱 ===== */
+.s04{background:#f2f4f8}
+.s04 .head{position:absolute;top:0;left:0;right:0;height:108px;background:#fff;padding:56px 20px 0;border-bottom:1px solid var(--line);z-index:2}
+.s04 .head .brand{display:block;font-size:12px;font-weight:800;color:var(--pink);letter-spacing:-.2px}
+.s04 .head h1{font-size:22px;font-weight:800;margin-top:2px}
+.s04 .body{position:absolute;top:108px;left:0;right:0;bottom:176px;overflow-y:auto;padding:14px 16px 16px}
+.s04 .box{background:#fff;border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(20,39,90,.06)}
+.s04 .p-name{font-size:18px;font-weight:800;margin-bottom:10px}
+.s04 .p-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.s04 .p-tags span{background:var(--navy-soft);color:var(--navy);font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px}
+.s04 .p-tags span:last-child{background:var(--pink-soft);color:#e0356f}
+.s04 .risk{display:inline-block;background:#ffecec;color:#d62b2b;font-size:13px;font-weight:800;padding:5px 12px;border-radius:12px;margin-bottom:12px}
+.s04 .p-row{display:flex;gap:10px;font-size:13.5px;border-top:1px solid var(--line);padding-top:12px}
+.s04 .p-row .k{color:var(--gray);flex:none;font-weight:600}
+.s04 .p-row .v{font-weight:700}
+.s04 .box h3{font-size:14px;font-weight:800;margin-bottom:10px}
+.s04 .warn{background:#fff4e5;color:#a35a00;font-size:13px;font-weight:700;line-height:1.55;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.s04 .chk{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 2px;font-size:14.5px;font-weight:600}
+.s04 .chk + .chk{border-top:1px solid var(--line)}
+.s04 .chk .cb{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid #c9ceda;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;transition:all .15s}
+.s04 .chk.on .cb{background:var(--navy);border-color:var(--navy)}
+.s04 .foot{position:absolute;left:0;right:0;bottom:0;z-index:3;background:#fff;border-top:1px solid var(--line);padding:12px 16px 28px;box-shadow:0 -6px 18px rgba(20,39,90,.06)}
+.s04 .amt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.s04 .amt .k{font-size:13px;font-weight:600;color:var(--gray)}
+.s04 .amt .v{font-size:22px;font-weight:900;color:var(--navy)}
+.s04 .btn{padding:15px 16px}
+.s04 .btn:disabled{background:#d5d9e2;color:#fff;box-shadow:none;cursor:not-allowed;transform:none}
+.s04 .notice{margin-top:8px;font-size:10px;line-height:1.45;color:var(--gray);text-align:center;word-break:keep-all}
+.s04 .done{position:absolute;inset:0;z-index:10;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;opacity:0;pointer-events:none;transition:opacity .25s}
+.s04 .done.show{opacity:1;pointer-events:auto}
+.s04 .done svg{width:104px;height:104px}
+.s04 .done circle{fill:none;stroke:var(--pink);stroke-width:6;stroke-dasharray:289;stroke-dashoffset:289}
+.s04 .done path{fill:none;stroke:var(--pink);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60}
+.s04 .done.show circle{animation:draw .6s ease forwards}
+.s04 .done.show path{animation:draw .4s .5s ease forwards}
+.s04 .done h2{font-size:26px;font-weight:900;opacity:0}
+.s04 .done.show h2{animation:inFade .4s .8s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ===== S05 앵커 해설 ===== */
+.newsbar{position:absolute;top:54px;left:14px;right:14px;z-index:15;background:rgba(20,39,90,.92);color:#fff;font-size:13px;font-weight:700;padding:9px 14px;border-radius:12px;display:flex;align-items:center;gap:8px}
+.newsbar::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pink);animation:blink 1.2s infinite}
+.stairs-ov{position:absolute;top:100px;left:60px;right:60px;z-index:12;background:rgba(255,255,255,.95);border-radius:16px;padding:10px 14px 10px;box-shadow:0 8px 22px rgba(20,39,90,.25);opacity:0;transform:translateY(-8px);transition:opacity .3s,transform .3s;pointer-events:none}
+.stairs-ov.show{opacity:1;transform:none}
+.stairs-ov h4{font-size:11.5px;font-weight:800;color:var(--navy);text-align:center;margin-bottom:4px}
+.stairs-ov .stairs .bar{animation:none;transform:scaleY(0)}
+.stairs-ov.show .stairs .bar{animation:grow .6s ease both}
+
+/* ===== S06~S08 뉴스 / 그래프 ===== */
+.news .bubble{bottom:64px;transition:opacity .3s}
+.news .bubble.gone{opacity:0;pointer-events:none}
+.news .band{position:absolute;top:54px;left:14px;right:14px;z-index:15;color:#fff;font-size:13.5px;font-weight:800;padding:9px 14px;border-radius:12px;background:#e5253a;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.news .band.blue{background:#1f5fd1}
+.ticker{position:absolute;left:0;right:0;bottom:30px;height:28px;z-index:16;background:rgba(10,20,50,.94);display:flex;align-items:center;overflow:hidden}
+.ticker .tk-label{flex:none;height:100%;display:flex;align-items:center;padding:0 10px;background:#e5253a;color:#fff;font-size:11px;font-weight:800}
+.ticker.blue .tk-label{background:#1f5fd1}
+.ticker .tk-view{flex:1;overflow:hidden;white-space:nowrap}
+.ticker .tk-run{display:inline-block;animation:tick 22s linear infinite}
+.ticker .tk-run span{display:inline-block;padding-right:80px;color:#fff;font-size:12.5px;font-weight:600}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+.gcard{position:absolute;top:104px;left:16px;right:16px;z-index:10;background:rgba(255,255,255,.96);border-radius:20px;padding:14px 16px 12px;box-shadow:0 10px 28px rgba(0,0,0,.28);opacity:0;transform:translateY(18px);transition:opacity .4s,transform .4s;pointer-events:none}
+.gcard.show{opacity:1;transform:none}
+.gcard .gh{position:relative;height:44px}
+.gcard .gt{font-size:14px;font-weight:800;line-height:1.35}
+.gcard .gt small{display:block;font-size:11px;font-weight:600;color:var(--gray)}
+.stamp{position:absolute;top:-26px;right:-6px;display:flex;flex-direction:column;align-items:center;padding:5px 12px 6px;border:3px solid currentColor;border-radius:10px;background:rgba(255,255,255,.92);box-shadow:0 0 0 2px #fff,0 4px 12px rgba(0,0,0,.18);opacity:0;transform:scale(2.4) rotate(-14deg);transition:opacity .15s,transform .28s cubic-bezier(.2,1.7,.4,1)}
+.stamp.show{opacity:1;transform:scale(1) rotate(-6deg)}
+.stamp b{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1.2}
+.stamp span{font-size:10.5px;font-weight:700;line-height:1.3}
+.stamp.fail{color:#d62b2b}
+.stamp.ok{color:#1769d8}
+.svgbox{position:relative}
+.svgbox svg{display:block;width:100%;height:auto;overflow:visible}
+.svgbox .grid{stroke:#e3e6ee;stroke-width:1}
+.svgbox .ax{font-size:10.5px;fill:#8a8f99;font-weight:600}
+.svgbox .crit{stroke:var(--navy);stroke-width:1.8;stroke-dasharray:6 4}
+.svgbox .crit.pass{stroke:#ffb400;stroke-width:3}
+.svgbox .cl{font-size:11px;font-weight:800;fill:var(--navy);paint-order:stroke;stroke:#fff;stroke-width:3px}
+.svgbox .hl{font-size:13px;font-weight:900;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.lg{display:flex;justify-content:space-between;gap:4px;margin-top:6px}
+.lg .lgi{font-size:11px;font-weight:600;color:#4a5370;white-space:nowrap;padding:3px 6px;border-radius:8px}
+.lg .lgi i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.lg .lgi b{font-weight:800}
+.lg .lgi.w{background:var(--pink-soft);color:var(--navy);font-weight:800}
+.spark{position:absolute;width:0;height:0;pointer-events:none;z-index:5}
+.spark b{position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:50%;border:3px solid #ffc933;animation:ring .7s ease-out forwards}
+.spark i{position:absolute;left:-6px;top:-6px;width:12px;height:12px;background:#ffc933;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:spk .9s ease-out forwards}
+@keyframes ring{from{transform:scale(.2);opacity:1}to{transform:scale(1.5);opacity:0}}
+@keyframes spk{0%{opacity:1;transform:translate(0,0) scale(.3)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.7)}}
+
+.react{position:absolute;left:8px;right:12px;bottom:140px;height:200px;z-index:11;opacity:0;transform:translateY(16px);transition:opacity .4s,transform .4s;pointer-events:none}
+.react.show{opacity:1;transform:none}
+.react .char{height:200px;left:0;bottom:0;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.react .mini{position:absolute;left:140px;right:0;top:30px;background:#fff;border-radius:16px;padding:10px 14px 12px;font-size:14.5px;font-weight:600;line-height:1.5;color:var(--navy);box-shadow:0 6px 16px rgba(0,0,0,.25);word-break:keep-all}
+.react .mini::before{content:"";position:absolute;left:-8px;top:22px;border:8px solid transparent;border-left:0;border-right-color:#fff}
+.react .mini .nm{display:block;font-size:11px;font-weight:800;color:var(--pink);margin-bottom:1px}
+.taphint{position:absolute;left:0;right:0;bottom:72px;z-index:12;margin:0 auto;width:max-content;padding:7px 16px;border-radius:16px;background:rgba(255,255,255,.92);color:var(--navy);font-size:12.5px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .3s}
+.taphint.show{opacity:1}
+.taphint span{color:var(--pink);display:inline-block;animation:blink 1s infinite}
+.nextbtn{position:absolute;left:16px;right:16px;bottom:68px;z-index:12;width:auto;opacity:0;pointer-events:none;transition:opacity .4s}
+.nextbtn.show{opacity:1;pointer-events:auto}
+
+/* ===== S09~S11 공통 ===== */
+.bubble{transition:opacity .3s}
+.bubble.gone{opacity:0;pointer-events:none}
+.bgl{position:absolute;inset:0;transition:opacity .5s}
+.bgl.off{opacity:0}
+
+/* ===== S09 결과 ===== */
+.s09 .char{height:470px;left:50%;margin-left:-164px;bottom:120px;z-index:5}
+.s09 .bubble{bottom:74px}
+.s09 .rwrap{position:absolute;top:84px;left:18px;right:18px;height:172px;z-index:8}
+.s09 .rcard{position:absolute;inset:0;background:rgba(255,255,255,.94);border-radius:22px;padding:14px 18px;box-shadow:0 10px 28px rgba(190,80,120,.25);opacity:0;transform:scale(.95);transition:opacity .45s,transform .45s;text-align:center}
+.s09 .rcard.on{opacity:1;transform:none}
+.s09 .lbl{font-size:13px;font-weight:700;color:var(--gray)}
+.s09 .rate{font-size:54px;font-weight:900;color:var(--pink);line-height:1.15;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.s09 .stats{display:flex;gap:10px;margin-top:6px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.s09 .stats.in{opacity:1;transform:none}
+.s09 .stats div{flex:1;background:var(--pink-soft);border-radius:14px;padding:8px 6px}
+.s09 .stats span{display:block;font-size:11.5px;font-weight:700;color:var(--gray)}
+.s09 .stats b{font-size:16px;font-weight:900;color:var(--navy)}
+.s09 .amt{font-size:42px;font-weight:900;color:var(--navy);line-height:1.2;margin-top:10px}
+.s09 .rec{display:inline-block;margin-top:8px;background:var(--pink-soft);color:#e0356f;font-size:22px;font-weight:900;padding:6px 20px;border-radius:20px}
+.s09 .rec small{font-size:14px;font-weight:700;margin-right:6px;color:var(--navy)}
+.s09 .nextbtn{bottom:74px}
+.s09 .notice9{position:absolute;left:20px;right:20px;bottom:30px;z-index:18;text-align:center;font-size:10px;line-height:1.45;color:#8a7380;word-break:keep-all}
+
+/* ===== S10 해설 / 용어 카드 ===== */
+.sheet{position:absolute;left:12px;right:12px;top:100px;bottom:34px;z-index:22;background:rgba(255,255,255,.97);border-radius:22px;box-shadow:0 12px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;opacity:0;transform:translateY(30px);transition:opacity .4s,transform .4s;pointer-events:none}
+.sheet.show{opacity:1;transform:none;pointer-events:auto}
+.sheet h3{padding:18px 20px 10px;font-size:17px;font-weight:800}
+.sheet .terms{flex:1;overflow-y:auto;padding:0 14px 6px}
+.sheet .term{border:2px solid var(--navy-soft);border-radius:14px;margin-bottom:8px;background:#fff;overflow:hidden}
+.sheet .term.open{border-color:var(--pink)}
+.sheet .term .t{display:flex;justify-content:space-between;align-items:center;width:100%;padding:13px 14px;font-size:15px;font-weight:800;text-align:left}
+.sheet .term .t i{font-style:normal;color:var(--pink);font-size:20px;line-height:1;transition:transform .25s}
+.sheet .term.open .t i{transform:rotate(45deg)}
+.sheet .term .d{max-height:0;overflow:hidden;padding:0 14px;font-size:13.5px;line-height:1.6;color:#3a4566;transition:max-height .3s,padding .3s;word-break:keep-all}
+.sheet .term.open .d{max-height:220px;padding:0 14px 14px}
+.sheet .foot{padding:10px 14px 16px}
+
+/* ===== S11 퀴즈 ===== */
+.s11 .qcard{position:absolute;top:96px;left:14px;right:14px;z-index:12;background:rgba(255,255,255,.97);border-radius:22px;padding:16px 16px 10px;box-shadow:0 12px 30px rgba(0,0,0,.3);opacity:0;transform:translateY(24px);transition:opacity .4s,transform .4s;pointer-events:none}
+.s11 .qcard.show{opacity:1;transform:none;pointer-events:auto}
+.s11 .qtag{display:inline-block;background:var(--pink);color:#fff;font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:10px}
+.s11 .qq{font-size:18px;font-weight:800;line-height:1.45;margin:8px 0 14px;word-break:keep-all}
+.s11 .qc{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:13px 14px;border:2px solid var(--navy-soft);border-radius:14px;margin-bottom:8px;font-size:15px;font-weight:600;background:#fff;transition:border-color .2s,background .2s,transform .1s}
+.s11 .qc:active{transform:scale(.98)}
+.s11 .qc .no{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy-soft);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.s11 .qc.right{border-color:#2fb67c;background:#e9f8f1}
+.s11 .qc.wrong{border-color:#e5484d;background:#ffecec}
+.s11 .qcard.locked .qc{pointer-events:none}
+.s11 .nextbtn{bottom:196px;z-index:21}
+
+/* ===== S12 메인 ===== */
+.s12 .gcards{position:absolute;top:84px;left:16px;right:16px;z-index:8;display:flex;gap:10px}
+.s12 .gc{flex:1;min-width:0;background:rgba(255,255,255,.94);border-radius:18px;padding:12px 14px 14px;box-shadow:0 8px 22px rgba(190,80,120,.2)}
+.s12 .gc .gl{font-size:12.5px;font-weight:700;color:var(--gray);white-space:nowrap}
+.s12 .gc .gv{font-size:22px;font-weight:900;color:var(--navy);line-height:1.25;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.s12 .gc .gf{font-size:11px;font-weight:600;color:var(--gray);text-decoration:line-through;min-height:14px}
+.s12 .gauge{height:10px;border-radius:5px;background:#eceff5;overflow:hidden;margin-top:8px}
+.s12 .gauge i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#ff7aa8,#ff4d85);transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.s12 .gauge i.on{min-width:4px}
+.s12 .char{height:470px;left:-10px;bottom:70px;z-index:5}
+.s12 .speech{position:absolute;left:190px;right:14px;top:222px;z-index:9;background:#fff;border-radius:18px;padding:12px 14px 14px;box-shadow:0 8px 20px rgba(190,80,120,.25);font-size:15.5px;font-weight:600;line-height:1.5;color:var(--navy);word-break:keep-all;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.s12 .speech.show{opacity:1;transform:none}
+.s12 .speech::before{content:"";position:absolute;left:-8px;top:26px;border:8px solid transparent;border-left:0;border-right-color:#fff}
+.s12 .speech .nm{display:block;font-size:11.5px;font-weight:800;color:var(--pink);margin-bottom:2px}
+.s12 .actions{position:absolute;left:16px;right:16px;bottom:40px;z-index:15;display:flex;gap:10px}
+
+/* ===== S13 / S14 흰 배경 앱 UI ===== */
+.app{background:#f2f4f8}
+.app .head{position:absolute;top:0;left:0;right:0;height:108px;background:#fff;padding:56px 20px 0;border-bottom:1px solid var(--line);z-index:2}
+.app .head .brand{display:block;font-size:12px;font-weight:800;color:var(--pink)}
+.app .head h1{font-size:22px;font-weight:800;margin-top:2px}
+.app .body{position:absolute;top:108px;left:0;right:0;bottom:0;overflow-y:auto;padding:14px 16px 24px}
+.app .box{background:#fff;border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(20,39,90,.06)}
+.app .sec{font-size:14px;font-weight:800;margin:6px 2px 10px}
+.s13 .profile{display:flex;align-items:center;gap:14px}
+.s13 .avatar{flex:none;width:58px;height:58px;border-radius:50%;overflow:hidden;background:var(--pink-soft);border:2px solid var(--pink-soft)}
+.s13 .avatar img,.s13 .avatar .ph{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 8%;padding:0}
+.s13 .profile .pt{font-size:15px;font-weight:700;line-height:1.5;word-break:keep-all}
+.s13 .els .nm{font-size:17px;font-weight:800}
+.s13 .els .mt{display:inline-block;margin-left:8px;background:var(--navy-soft);color:var(--navy);font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:9px;vertical-align:2px}
+.s13 .els .rt{margin:14px 0 12px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.s13 .els .rt .l{font-size:13px;font-weight:600;color:var(--gray)}
+.s13 .els .rt .v{font-size:30px;font-weight:900;color:var(--pink)}
+.s13 .els .rt .n{font-size:12.5px;font-weight:600;color:var(--gray)}
+.s13 .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.s13 .badges span{background:#f2f4f8;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:12px}
+.s13 .badges span.ok{background:#e9f8f1;color:#1d8a5c}
+.s13 .badges span.no{background:#ffecec;color:#d62b2b}
+.s13 .slot{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.6);border:2px dashed #cfd4e0;border-radius:18px;padding:18px;margin-bottom:10px;color:#8a8f99}
+.s13 .slot .ic{font-size:24px}
+.s13 .slot b{font-size:15px;font-weight:800;color:#6b7080}
+.s13 .slot span{margin-left:auto;font-size:12.5px;font-weight:700}
+.s14 .body{bottom:176px}
+.s14 .info{background:#fff4e5;color:#a35a00;font-size:13.5px;font-weight:700;line-height:1.55;border-radius:14px;padding:13px 15px;margin-bottom:12px;word-break:keep-all}
+.s14 .pn{font-size:18px;font-weight:800;margin-bottom:6px}
+.s14 .kv{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.55}
+.s14 .kv:first-of-type{border-top:0}
+.s14 .kv .k{flex:none;width:62px;color:var(--gray);font-weight:600}
+.s14 .kv .v{flex:1;font-weight:700;word-break:keep-all}
+.s14 .kv .gm{display:block;margin-top:5px;background:#fff4e5;color:#a35a00;font-size:12px;font-weight:700;padding:5px 9px;border-radius:9px}
+.s14 .foot{position:absolute;left:0;right:0;bottom:0;z-index:3;background:#fff;border-top:1px solid var(--line);padding:12px 16px 28px;box-shadow:0 -6px 18px rgba(20,39,90,.06)}
+.s14 .foot .btn{padding:15px 16px}
+.s14 .notice{margin-top:8px;font-size:10px;line-height:1.45;color:var(--gray);text-align:center;word-break:keep-all}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <div class="stage" id="stage"></div>
+  <div class="nav" id="nav">
+    <button class="back" id="btnBack" aria-label="뒤로가기"></button>
+    <button class="home" id="btnHome"></button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="save" id="save"></div>
+</div>
+
+<script>
+/* =====================================================================
+   CONTENT — 모든 문구·수치·이미지 경로는 여기서만 수정한다.
+   텍스트 안의 **굵게** 는 강조(핑크)로 표시된다.
+   성별에 따라 달라지는 문구는 { male:'…', female:'…' } 로 둔다.
+   ===================================================================== */
+const CONTENT = {
+  ui: {
+    back: '‹',
+    home: '처음으로',
+    saving: '⟳ 저장 중…',
+    saved: '✓ 안전하게 저장되었습니다',
+    appName: '탕진증권',
+    narrator: '',                      // 나레이션 말풍선에는 이름표를 달지 않는다
+    anchorName: '앵커',
+    tapHint: '탭해서 계속',
+    notice: '본 화면은 실제 상품을 교육 목적으로 단순화·재구성한 가상 시나리오이며, 실제 상품 조건 및 수익과 다릅니다. 투자 권유가 아닙니다.'
+  },
+
+  images: {
+    logo: 'images/logo.png',            // S00 타이틀(너비 90%), S13 헤더(높이 28px), 파비콘
+    bgHome: 'images/backgrounds/bg_home.png.jpg',
+    // PRD의 anchor_studio_default 에 해당하는 실제 파일
+    bgAnchorDefault: 'images/backgrounds/anchor_default.png.jpg',
+    // PRD의 anchor_news_* 에 해당하는 실제 파일 (앵커 없이 장면만 있는 이미지)
+    bgNewsTariff: 'images/backgrounds/bg_news_tariff.png.jpg',
+    bgNewsWar:    'images/backgrounds/bg_news_war.png.jpg',
+    bgNewsChip:   'images/backgrounds/bg_news_chip.png.jpg',
+    bgSuccess:    'images/backgrounds/bg_success.png.jpg',
+    // anchor_smile / anchor_serious 파일이 아직 없어 빈 스튜디오 이미지로 임시 대체.
+    // 나중에 전용 이미지가 생기면 아래 경로만 바꾸면 된다.
+    bgAnchorSmile:   'images/backgrounds/bg_news_studio.png.jpg',
+    bgAnchorSerious: 'images/backgrounds/bg_news_studio.png.jpg'
+  },
+
+  /* 지수 그래프 (S06~S08 공용) — 수치는 PRD 5장 표 */
+  chart: {
+    title: '지수 추이',
+    subtitle: '가입일 = 100%',
+    tickerLabel: '탕진뉴스',
+    criterionLabel: '기준',
+    series: [
+      { key: 'eurostoxx', name: 'EuroStoxx50', color: '#4f8ef7' },
+      { key: 'kospi',     name: 'KOSPI200',    color: '#ff5c93' },
+      { key: 'sp500',     name: 'S&P500',      color: '#2fb67c' }
+    ],
+    xLabels: ['가입', '1년', '2년', '3년'],
+    yMin: 55, yMax: 105,
+    gridLines: [100, 80, 60],
+    data: {
+      eurostoxx: [100, 88, 72, 80],
+      kospi:     [100, 79, 61, 71.5],
+      sp500:     [100, 90, 86, 95]
+    }
+  },
+
+  /* 상품 정보 (S04, S05 공용) */
+  product: {
+    name: '스텝다운 ELS',               // 가명 (목업 단계: 실제 상품명·증권사명 사용 안 함)
+    tags: ['스텝다운형', '3년', '연 10.4% (세전)'],
+    risk: '🔴 매우 높은 위험',
+    assetsLabel: '기초자산',
+    assets: 'EuroStoxx50 · KOSPI200 · S&P500',
+    stepsTitle: '상환 조건',
+    steps: [
+      { label: '1년', pct: 85 },
+      { label: '2년', pct: 80 },
+      { label: '3년', pct: 70 }
+    ]
+  },
+
+  spouse: {
+    male:   { label: '남편', name: '백은호',
+              img: { default: 'images/characters/male_default.png',
+                     happy:   'images/characters/male_happy.png',
+                     sad:     'images/characters/male_sad.png' } },
+    female: { label: '아내', name: '배희주',
+              img: { default: 'images/characters/female_default.png',
+                     happy:   'images/characters/female_happy.png',
+                     sad:     'images/characters/female_sad.png' } }
+  },
+
+  S00: {
+    question: '내 배우자의 성별은?'
+  },
+
+  S01: {
+    bg: 'bgHome',
+    lines: [
+      { who: 'narr',   mood: 'default', text: '평화롭던 어느 날, 통장 잔고를 확인한 당신.' },
+      { who: 'narr',   mood: 'default', text: '사라진 돈… **3억 2천만 원.**' },
+      { who: 'spouse', mood: 'sad',     text: '여보… 그게… 원금 보장 안 되는 상품인 줄 몰랐어…' },
+      { who: 'narr',   mood: 'sad',     text: '이혼 서류를 꺼내려던 순간—' },
+      { who: 'spouse', mood: 'default', text: { male: '…그래도 나 아직 멋있지?', female: '…그래도 나 아직 예쁘지?' } },
+      { who: 'narr',   mood: 'default', text: '……반박할 수 없다. 이혼은 보류.' },
+      { who: 'narr',   mood: 'default', text: '남은 가용자산은 **2,000만 원.** 이번엔 내가 제대로 배워서 메꿔 보자!' }
+    ]
+  },
+
+  S02: {
+    question: '어떤 투자상품을\n사볼까?',
+    high: '고위험 · 고수익',
+    low: '저위험 · 저수익',
+    lowToast: '준비 중이에요! 이번엔 고위험 상품을 경험해 볼까요?'
+  },
+
+  S03: {
+    badge: 'ELS 안내',
+    title: '**ELS(주가연계증권)**를\n경험합니다',
+    desc: '주가지수가 정해진 기준 아래로 크게 떨어지지 않으면 약속된 수익을 주는 상품이에요. 대신 기준 아래로 떨어지면 원금을 잃을 수 있어요.',
+    yes: '예',
+    no: '아니요'
+  },
+
+  S04: {
+    appName: '탕진증권',
+    title: '상품 가입',
+    warning: '⚠️ 원금 비보장 / 예금자보호 미적용 / 중도상환 시 손실 가능',
+    checks: [
+      '투자성향에 맞는 상품인지 확인했어요',
+      '원금 손실 가능성을 이해했어요'
+    ],
+    amountLabel: '투자금액',
+    amount: '7,000,000원',
+    buy: '구매하기',
+    doneTitle: '구매 완료!'
+  },
+
+  S05: {
+    bar: '탕진뉴스 | 오늘의 상품 해설',
+    stairsOnLines: [1, 2],             // 계단 도식을 보여줄 대사 번호(0부터)
+    lines: [
+      { who: 'anchor', text: '안녕하세요, 탕진뉴스입니다. 오늘은 방금 가입하신 스텝다운 ELS를 알아볼게요.' },
+      { who: 'anchor', text: '1년마다 세 지수를 확인해서, **가장 많이 떨어진 지수**가 기준 이상이면 원금과 수익을 돌려받아요.' },
+      { who: 'anchor', text: '기준은 1년차 85%, 2년차 80%, 만기 70%로 점점 낮아져요. 그래서 \'스텝다운\'이라고 부르죠.' },
+      { who: 'anchor', text: '자, 그럼 1년 뒤로 가 볼까요?' }
+    ]
+  },
+
+  /* 상황 1 — 1년차: 관세 충격 */
+  S06: {
+    bg: 'bgNewsTariff', year: 1, criterion: 85,
+    band: '🔴 속보 | 2027년 11월 (가상)', bandKind: 'red',
+    ticker: '미국 전방위 관세 부과… 한국 수출 직격탄… 코스피 급락',
+    lines: [
+      { who: 'anchor', text: '속보입니다. 미국이 전방위 관세를 부과하면서, 수출 비중이 큰 한국 증시가 가장 크게 흔들렸습니다.' },
+      { who: 'anchor', text: '오늘은 1차 조기상환 평가일. 세 지수 중 가장 약한 코스피가 기준인데요, 기준은 **85%**입니다.' }
+    ],
+    stamp: { kind: 'fail', text: '조기상환 실패', sub: '최저 79% < 기준 85%' },
+    spouse: { mood: 'sad', text: '히익… 또 잃는 거야…?' },
+    next: '1년 뒤로 →', nextId: 'S07'
+  },
+
+  /* 상황 2 — 2년차: 중동 전쟁·유가 폭등 */
+  S07: {
+    bg: 'bgNewsWar', year: 2, criterion: 80,
+    band: '🔴 속보 | 2028년 11월 (가상)', bandKind: 'red',
+    ticker: '중동 전쟁 발발… 국제 유가 배럴당 130달러 돌파… 유럽·한국 증시 동반 급락',
+    lines: [
+      { who: 'anchor', text: '또 속보입니다. 중동 전쟁으로 유가가 폭등하면서, 원유 수입 의존도가 높은 유럽과 한국 증시가 함께 급락했습니다.' },
+      { who: 'anchor', text: '관세 충격이 채 회복되지 않은 코스피는 **61%**까지 떨어졌네요. 2차 기준은 **80%**입니다.' }
+    ],
+    stamp: { kind: 'fail', text: '조기상환 실패', sub: '최저 61% < 기준 80%' },
+    spouse: { mood: 'sad', text: '만기에 70%까지 회복 못 하면… 우린 끝이야…' },
+    next: '만기일로 →', nextId: 'S08'
+  },
+
+  /* 상황 3 — 만기: 반도체 호황 */
+  S08: {
+    bg: 'bgNewsChip', year: 3, criterion: 70, dramatic: true,
+    band: '🔵 경제 | 2029년 11월 (가상) · 만기 평가일', bandKind: 'blue',
+    ticker: '반도체 수출 사상 최대… 경상수지 역대 최고 기록… 코스피 급반등',
+    lines: [
+      { who: 'anchor', text: '반가운 소식입니다! 반도체 수출이 사상 최대를 기록하며 코스피가 크게 올랐습니다.' },
+      { who: 'anchor', text: '오늘은 만기 평가일. 기준은 **70%**입니다. 과연…?' }
+    ],
+    stamp: { kind: 'ok', text: '만기 상환 성공!', sub: '최저 71.5% ≥ 기준 70%' },
+    spouse: { mood: 'happy', text: '넘었다!!!' },
+    next: '결과 보기', nextId: 'S09'
+  },
+
+  /* 결과 */
+  S09: {
+    bg: 'bgSuccess',
+    rate: 31.2, ratePrefix: '+', rateSuffix: '%',
+    rateLabel: '수익률 (세전)',
+    profitLabel: '수익', profit: '+2,184,000원',
+    payoutLabel: '수령액', payout: '9,184,000원',
+    recoverLabel: '3억 2천만 원 중 회복한 금액',
+    recoverAmount: '218.4만 원',
+    recoverRateLabel: '회복률', recoverRate: '0.7%',
+    lines: [
+      { who: 'spouse', mood: 'happy', phase: 1, text: '우리 돈이 돌아왔어! 역시 당신이야!' },
+      { who: 'spouse', mood: 'sad',   phase: 2, text: '3년 버텼는데… 0.7%…?' },
+      { who: 'narr',   mood: 'sad',   phase: 2, text: '잃기는 한순간, 회복은 3년. 그래도 첫걸음이다!' }
+    ],
+    next: '해설 듣기', nextId: 'S10'
+  },
+
+  /* 앵커 해설 */
+  S10: {
+    bg: 'bgAnchorSmile',
+    lines: [
+      { who: 'anchor', text: '축하드립니다! 두 번의 조기상환 실패 끝에, 만기에 기준을 넘어 약속된 수익을 받았어요.' },
+      { who: 'anchor', text: '하지만 기억하세요. 만기 때 가장 약한 지수가 70%보다 1.5%p만 낮았어도 원금 손실이었어요.' },
+      { who: 'anchor', text: 'ELS는 3년 동안 돈이 묶일 수 있고 중도상환하면 손실이 날 수 있어요. 구조를 이해하고, 오래 기다릴 수 있는 돈으로 하는 게 중요합니다.' }
+    ],
+    termsTitle: '오늘 배운 용어',
+    terms: [
+      { name: '스텝다운', desc: '평가 때마다 상환 기준이 단계적으로 낮아지는 구조' },
+      { name: '조기상환', desc: '평가일에 조건을 충족하면 만기 전에 원금과 수익을 돌려받는 것' },
+      { name: 'Worst-of (최저 지수 기준)', desc: '여러 기초자산 중 가장 많이 떨어진 지수 하나로 판단' },
+      { name: '낙인(Knock-in)', desc: '실제 이 상품은 기초자산 중 하나라도 최초가의 40% 미만으로 떨어진 적이 있으면 원금 손실 구간이 될 수 있음 (게임에서는 단순화를 위해 제외)' }
+    ],
+    next: '퀴즈 풀기', nextId: 'S11'
+  },
+
+  /* 퀴즈 */
+  S11: {
+    intro: [{ who: 'anchor', text: '오늘 배운 내용, 확인해 볼까요?' }],
+    tag: '퀴즈',
+    question: '이 ELS의 상환 여부는 무엇을 기준으로 판단할까요?',
+    choices: ['3개 지수의 평균', '가장 많이 오른 지수', '가장 많이 떨어진 지수', '코스피200만'],
+    answer: 2,                          // 0부터 센 정답 번호 (③)
+    correct: '정답입니다! 세 지수 중 가장 약한 지수 하나가 기준이에요.',
+    wrong: '아쉬워요! 기준은 가장 많이 떨어진 지수예요. 그래프에서 매번 가장 아래 있던 코스피가 기준이었던 것 기억나시죠?',
+    next: '메인으로', nextId: 'S12'
+  },
+
+  /* 메인 */
+  S12: {
+    bg: 'bgHome',
+    // gaugeMax 는 게이지가 가득 찼을 때의 값(표시용)
+    asset:   { icon: '💰', label: '가용자산', from: '2,000만 원', fromNum: 2000, to: 2218.4, toText: '2,218.4만 원', unit: '만 원', gaugeMax: 2500 },
+    recover: { icon: '💔', label: '3억 2천 회복률', to: 0.7, toText: '0.7%', unit: '%', gaugeMax: 100 },
+    speech: '다음엔 뭘 배워 볼까? 같이 갚아 나가자!',
+    next: '다음 투자교육',
+    nextToast: '곧 새로운 상품이 찾아와요!',
+    mypage: '마이페이지', mypageId: 'S13'
+  },
+
+  /* 마이페이지 */
+  S13: {
+    title: '마이페이지',
+    profile: '나 ♥ {name} · 탕진 회복 중인 부부',     // {name} = 선택한 배우자 이름
+    section: '내 투자상품',
+    elsMeta: '스텝다운형',
+    rateLabel: '경험 수익률', rate: '+31.2%', rateNote: '(만기 상환)',
+    learned: '✅ 학습 완료',
+    quiz: { correct: '🧠 퀴즈 정답', wrong: '🧠 퀴즈 오답', none: '🧠 퀴즈 미응시' },
+    more: '더 알아보기', moreId: 'S14',
+    slots: [
+      { icon: '🔒', name: '채권', note: '준비 중' },
+      { icon: '🔒', name: '펀드', note: '준비 중' }
+    ]
+  },
+
+  /* 상품 상세 */
+  S14: {
+    title: '상품 상세',
+    info: '게임에서 경험한 조건은 이해를 돕기 위해 단순화한 것이에요. 실제 조건은 아래에서 확인하세요.',
+    gameLabel: '게임에서는',
+    rows: [
+      { k: '유형',     v: '스텝다운형 · 원금 비보장' },
+      { k: '위험등급', v: '매우 높은 위험' },
+      { k: '기초자산', v: 'EuroStoxx50, KOSPI200, S&P500 (가장 많이 떨어진 지수 기준)' },
+      { k: '수익',     v: '조건 충족 시 연 10.4% (세전), 3년 만기 시 총 31.2%' },
+      { k: '만기',     v: '3년' },
+      { k: '평가',     v: '6개월마다 6회 (85·85·80·80·75·70% 이상이면 원금 + 수익 상환)', game: '1년마다 3회 (85·80·70%)' },
+      { k: '낙인(KI)', v: '기초자산 중 하나라도 40% 미만으로 떨어진 적이 있으면 원금 손실 구간', game: '판정에서 제외' },
+      { k: '기타',     v: '예금자보호 미적용 · 중도상환 시 원금 손실 가능 · 최대 손실 -100%' }
+    ],
+    link: 'https://securities.miraeasset.com/hks/hks4023/p02.do?item_cd=KR6MD00093S0',
+    linkBtn: '더 알아보기'
+  }
+};
+
+/* =====================================================================
+   상태 (JS 변수에만 보관)
+   ===================================================================== */
+const state = { gender: 'male', quizCorrect: null };
+const spouse = () => CONTENT.spouse[state.gender];
+const pick = v => (v && typeof v === 'object') ? v[state.gender] : v;
+
+/* =====================================================================
+   유틸
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmt = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+
+/* 이미지: 없으면 회색 플레이스홀더 + 파일명 */
+function makeImg(src, cls) {
+  const img = new Image();
+  img.className = cls || '';
+  img.alt = '';
+  img.draggable = false;
+  img.onerror = () => {
+    const ph = el('div', (cls ? cls + ' ' : '') + 'ph');
+    ph.textContent = src.split('/').pop();
+    img.replaceWith(ph);
+  };
+  img.src = src;
+  return img;
+}
+/* 파비콘: 경로는 CONTENT.images.logo 에서 가져온다 */
+(() => {
+  const l = document.createElement('link');
+  l.rel = 'icon'; l.type = 'image/png'; l.href = CONTENT.images.logo;
+  document.head.appendChild(l);
+})();
+const bgImg = (key, extra) => makeImg(CONTENT.images[key], 'bg' + (extra ? ' ' + extra : ''));
+const spouseImg = (mood, cls) => makeImg(spouse().img[mood], cls);
+
+/* =====================================================================
+   토스트 / 저장 표시
+   ===================================================================== */
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+let saveT1, saveT2;
+function flashSave() {
+  const s = $('save');
+  clearTimeout(saveT1); clearTimeout(saveT2);
+  s.textContent = CONTENT.ui.saving;
+  s.classList.add('show');
+  saveT1 = setTimeout(() => {
+    s.textContent = CONTENT.ui.saved;
+    saveT2 = setTimeout(() => s.classList.remove('show'), 2000);
+  }, 600);
+}
+
+/* =====================================================================
+   말풍선 (타이핑 효과)
+   탭 1회: 타이핑 즉시 완료 / 탭 2회: 다음 대사
+   ===================================================================== */
+function createDialogue(root, lines, opts = {}) {
+  const speaker = line => line.who === 'spouse' ? spouse().name : (line.who === 'anchor' ? (CONTENT.ui.anchorName || '') : CONTENT.ui.narrator);
+  const bubble = el('div', 'bubble');
+  const nameEl = el('div', 'name');
+  const txtEl = el('p', 'txt');
+  bubble.append(nameEl, txtEl, el('span', 'arrow', '▼'));
+  root.appendChild(bubble);
+
+  let i = -1, typing = false, timer = null, segs = [], total = 0, n = 0, dead = false;
+
+  const parse = text => {
+    segs = []; total = 0;
+    String(text).split(/(\*\*.+?\*\*)/).forEach(p => {
+      if (!p) return;
+      const bold = /^\*\*.+\*\*$/.test(p);
+      const t = bold ? p.slice(2, -2) : p;
+      segs.push({ t, bold }); total += t.length;
+    });
+  };
+  const paint = k => {
+    let left = k, html = '';
+    for (const s of segs) {
+      if (left <= 0) break;
+      const part = s.t.slice(0, left); left -= part.length;
+      const h = esc(part).replace(/\n/g, '<br>');
+      html += s.bold ? '<b>' + h + '</b>' : h;
+    }
+    txtEl.innerHTML = html;
+  };
+  const finish = () => { clearInterval(timer); typing = false; paint(total); bubble.classList.add('done'); };
+
+  const show = idx => {
+    i = idx;
+    const line = lines[i];
+    const name = speaker(line);
+    nameEl.textContent = name;
+    nameEl.style.display = name ? '' : 'none';
+    bubble.classList.toggle('narr', line.who === 'narr');
+    bubble.classList.remove('done');
+    parse(pick(line.text));
+    n = 0; typing = true; paint(0);
+    clearInterval(timer);
+    timer = setInterval(() => { n++; paint(n); if (n >= total) finish(); }, 28);
+    if (opts.onLine) opts.onLine(line, i);
+  };
+
+  const tap = e => {
+    if (dead) return;
+    e && e.stopPropagation();
+    if (typing) { finish(); return; }
+    if (i < lines.length - 1) show(i + 1);
+    else if (opts.onEnd) opts.onEnd();
+  };
+  root.addEventListener('click', tap);
+  show(0);
+
+  return { bubble, destroy() { dead = true; clearInterval(timer); root.removeEventListener('click', tap); } };
+}
+
+/* =====================================================================
+   화면 정의 — 각 화면은 (root) => cleanup 함수(선택) 를 반환
+   ===================================================================== */
+const SCREENS = {};
+
+/* ---- S00 배우자 선택 ---- */
+SCREENS.S00 = { nav: false, build(root) {
+  const C = CONTENT.S00;
+  root.classList.add('s00');
+  root.append(bgImg('bgHome', 'blur'), el('div', 'veil'));
+
+  const logo = el('div', 'logo');
+  logo.appendChild(makeImg(CONTENT.images.logo, ''));
+  root.appendChild(logo);
+  root.appendChild(el('div', 'ask', esc(C.question)));
+
+  const cards = el('div', 'cards');
+  ['male', 'female'].forEach(g => {
+    const sp = CONTENT.spouse[g];
+    const card = el('button', 'pick');
+    const thumb = el('div', 'thumb');
+    thumb.appendChild(makeImg(sp.img.default, ''));
+    card.appendChild(thumb);
+    card.appendChild(el('div', 'label', `<small>${esc(sp.label)}</small>${esc(sp.name)}`));
+    card.onclick = () => { state.gender = g; go('S01'); };
+    cards.appendChild(card);
+  });
+  root.appendChild(cards);
+}};
+
+/* ---- S01 인트로 스토리 (비주얼노벨) ---- */
+SCREENS.S01 = { build(root) {
+  const C = CONTENT.S01;
+  root.append(bgImg(C.bg));
+  const slot = el('div'); root.appendChild(slot);
+
+  let curMood = null, charEl = null;
+  const setMood = mood => {
+    if (mood === curMood) return;
+    curMood = mood;
+    const n = spouseImg(mood, 'char');
+    n.style.left = '50%'; n.style.bottom = '110px'; n.style.marginLeft = '-182px';
+    if (charEl) charEl.replaceWith(n); else slot.appendChild(n);
+    charEl = n;
+  };
+
+  const d = createDialogue(root, C.lines, {
+    onLine: line => setMood(line.mood),
+    onEnd: () => go('S02')
+  });
+  return () => d.destroy();
+}};
+
+/* ---- S02 상품 유형 질문 ---- */
+SCREENS.S02 = { build(root) {
+  const C = CONTENT.S02;
+  root.classList.add('s02');
+  root.append(bgImg('bgHome'), el('div', 'veil'));
+  root.appendChild(el('div', 'q', fmt(C.question)));
+
+  const opts = el('div', 'opts');
+  const hi = el('button', 'btn primary', esc(C.high));
+  const lo = el('button', 'btn ghost', esc(C.low));
+  hi.onclick = e => { e.stopPropagation(); go('S03'); };
+  lo.onclick = e => { e.stopPropagation(); toast(C.lowToast); };
+  opts.append(hi, lo);
+  root.appendChild(opts);
+
+  const c = spouseImg('default', 'char');
+  c.style.height = '330px'; c.style.left = '50%'; c.style.marginLeft = '-115px'; c.style.bottom = '0';
+  root.appendChild(c);
+}};
+
+/* ---- S03 ELS 안내 ---- */
+SCREENS.S03 = { build(root) {
+  const C = CONTENT.S03;
+  root.classList.add('s03');
+  root.append(bgImg('bgHome'), el('div', 'veil'));
+
+  const wrap = el('div', 'wrap');
+  const card = el('div', 'card');
+  card.innerHTML = `<span class="badge">${esc(C.badge)}</span><h2>${fmt(C.title)}</h2><p>${esc(C.desc)}</p>`;
+  const row = el('div', 'row');
+  const yes = el('button', 'btn primary', esc(C.yes));
+  const no = el('button', 'btn ghost', esc(C.no));
+  yes.onclick = () => go('S04');
+  no.onclick = () => go('S02');
+  row.append(yes, no);
+  card.appendChild(row);
+  wrap.appendChild(card);
+  root.appendChild(wrap);
+}};
+
+/* 계단 도식 (S04, S05 공용) — 값은 CONTENT.product.steps */
+function stairsEl() {
+  const wrap = el('div', 'stairs');
+  const steps = CONTENT.product.steps;
+  steps.forEach((s, i) => {
+    const h = Math.round((s.pct - 55) * 1.5);
+    const col = el('div', 'st' + (i === steps.length - 1 ? ' last' : ''));
+    col.innerHTML = `<div class="pct">${s.pct}%</div><div class="bar" style="height:${h}px"></div><div class="lb">${esc(s.label)}</div>`;
+    wrap.appendChild(col);
+  });
+  return wrap;
+}
+
+/* ---- S04 증권앱 구매 (가상 앱 "탕진증권") ---- */
+SCREENS.S04 = { build(root) {
+  const C = CONTENT.S04, P = CONTENT.product;
+  root.classList.add('s04');
+  root.appendChild(el('div', 'head', `<span class="brand">${esc(C.appName)}</span><h1>${esc(C.title)}</h1>`));
+
+  const body = el('div', 'body');
+  const card = el('div', 'box');
+  card.innerHTML =
+    `<div class="p-name">${esc(P.name)}</div>` +
+    `<div class="p-tags">${P.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>` +
+    `<div class="risk">${esc(P.risk)}</div>` +
+    `<div class="p-row"><span class="k">${esc(P.assetsLabel)}</span><span class="v">${esc(P.assets)}</span></div>`;
+  body.appendChild(card);
+
+  const st = el('div', 'box', `<h3>${esc(P.stepsTitle)}</h3>`);
+  st.appendChild(stairsEl());
+  body.appendChild(st);
+
+  body.appendChild(el('div', 'warn', esc(C.warning)));
+
+  const checks = el('div', 'box');
+  const btns = [];
+  C.checks.forEach(txt => {
+    const b = el('button', 'chk', `<span class="cb"></span><span>${esc(txt)}</span>`);
+    b.onclick = () => { b.classList.toggle('on'); b.querySelector('.cb').textContent = b.classList.contains('on') ? '✓' : ''; sync(); };
+    btns.push(b); checks.appendChild(b);
+  });
+  body.appendChild(checks);
+  root.appendChild(body);
+
+  const foot = el('div', 'foot');
+  foot.innerHTML =
+    `<div class="amt"><span class="k">${esc(C.amountLabel)}</span><span class="v">${esc(C.amount)}</span></div>`;
+  const buy = el('button', 'btn primary', esc(C.buy));
+  buy.disabled = true;
+  foot.appendChild(buy);
+  foot.appendChild(el('div', 'notice', esc(CONTENT.ui.notice)));
+  root.appendChild(foot);
+
+  const done = el('div', 'done',
+    `<svg viewBox="0 0 104 104"><circle cx="52" cy="52" r="46"/><path d="M30 54 L46 70 L76 38"/></svg><h2>${esc(C.doneTitle)}</h2>`);
+  root.appendChild(done);
+
+  const sync = () => { buy.disabled = !btns.every(b => b.classList.contains('on')); };
+  let timer;
+  buy.onclick = () => {
+    if (buy.disabled) return;
+    buy.disabled = true;
+    done.classList.add('show');
+    timer = setTimeout(() => go('S05'), 1700);
+  };
+  return () => clearTimeout(timer);
+}};
+
+/* ---- S05 앵커 상품 설명 ---- */
+SCREENS.S05 = { build(root) {
+  const C = CONTENT.S05;
+  root.append(bgImg('bgAnchorDefault'));
+  root.appendChild(el('div', 'newsbar', esc(C.bar)));
+
+  const ov = el('div', 'stairs-ov', `<h4>${esc(CONTENT.product.stepsTitle)}</h4>`);
+  ov.appendChild(stairsEl());
+  root.appendChild(ov);
+
+  const d = createDialogue(root, C.lines, {
+    onLine: (line, i) => ov.classList.toggle('show', C.stairsOnLines.includes(i)),
+    onEnd: () => go('S06')
+  });
+  return () => d.destroy();
+}};
+
+/* =====================================================================
+   S06~S08 뉴스 상황 — 공용 그래프 + 화면 빌더
+   ===================================================================== */
+const fmtPct = v => (Math.round(v * 10) / 10) + '%';
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+/* year: 몇 년차까지 그릴지(1~3), crit: 그 해의 기준(%), dramatic: 마지막 구간을 극적으로 연출 */
+function createChart(year, crit, dramatic) {
+  const ch = CONTENT.chart, D = ch.data;
+  const W = 326, H = 232, L = 36, R = 312, T = 14, B = 190, N = 3;
+  const X = i => L + (R - L) * i / N;
+  const Y = v => T + (ch.yMax - v) / (ch.yMax - ch.yMin) * (B - T);
+  const keys = ch.series.map(s => s.key);
+  const color = Object.fromEntries(ch.series.map(s => [s.key, s.color]));
+  // 이번 시점에서 가장 많이 떨어진 지수(최저) = 굵게 강조
+  const worst = keys.reduce((a, k) => D[k][year] < D[a][year] ? k : a, keys[0]);
+  const order = keys.filter(k => k !== worst).concat(worst);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}">`;
+  ch.gridLines.forEach(g => {
+    svg += `<line class="grid" x1="${L}" x2="${R}" y1="${Y(g)}" y2="${Y(g)}"/>` +
+           `<text class="ax" x="${L - 6}" y="${Y(g) + 4}" text-anchor="end">${g}%</text>`;
+  });
+  ch.xLabels.forEach((t, i) => { svg += `<text class="ax" x="${X(i)}" y="${B + 22}" text-anchor="middle">${esc(t)}</text>`; });
+  svg += `<line class="crit" x1="${L}" x2="${R}" y1="${Y(crit)}" y2="${Y(crit)}"/>` +
+         `<text class="cl" x="${L + 4}" y="${Y(crit) - 6}">${esc(ch.criterionLabel)} ${crit}%</text>`;
+  order.forEach(k => {
+    const w = k === worst;
+    svg += `<polyline class="ln" data-k="${k}" fill="none" stroke="${color[k]}" stroke-width="${w ? 4.5 : 2.4}" stroke-linecap="round" stroke-linejoin="round"/>` +
+           `<circle class="hd" data-k="${k}" cx="-30" cy="-30" r="${w ? 6 : 3.8}" fill="${color[k]}" stroke="#fff" stroke-width="2"/>`;
+  });
+  svg += `<text class="hl" fill="${color[worst]}" text-anchor="middle" x="-60" y="-60"></text></svg>`;
+
+  const wrap = el('div', 'chart');
+  const box = el('div', 'svgbox', svg);
+  const lg = el('div', 'lg', ch.series.map(s =>
+    `<span class="lgi${s.key === worst ? ' w' : ''}"><i style="background:${s.color}"></i>${esc(s.name)} <b></b></span>`).join(''));
+  wrap.append(box, lg);
+
+  const ln = {}, hd = {};
+  keys.forEach(k => { ln[k] = box.querySelector(`.ln[data-k="${k}"]`); hd[k] = box.querySelector(`.hd[data-k="${k}"]`); });
+  const critLine = box.querySelector('.crit'), hl = box.querySelector('.hl');
+
+  // k 지수를 upto 번째 점까지 그린 뒤 head(진행 중인 끝점)를 이어 붙인다
+  const draw = (k, upto, head) => {
+    const pts = D[k].slice(0, upto + 1).map((v, i) => [X(i), Y(v)]);
+    const val = head ? head.v : D[k][upto];
+    if (head) pts.push([head.x, Y(head.v)]);
+    ln[k].setAttribute('points', pts.map(p => p.join(',')).join(' '));
+    const last = pts[pts.length - 1];
+    hd[k].setAttribute('cx', last[0]); hd[k].setAttribute('cy', last[1]);
+    if (k === worst) {
+      hl.setAttribute('x', Math.min(W - 22, Math.max(22, last[0])));
+      hl.setAttribute('y', last[1] - 12);
+      hl.textContent = fmtPct(val);
+    }
+  };
+
+  const spark = (x, y) => {
+    const s = el('div', 'spark');
+    s.style.left = (x / W * 100) + '%'; s.style.top = (y / H * 100) + '%';
+    s.appendChild(el('b'));
+    for (let i = 0; i < 10; i++) {
+      const a = Math.PI * 2 * i / 10, r = 30 + (i % 2) * 14, st = el('i');
+      st.style.setProperty('--dx', Math.cos(a) * r + 'px');
+      st.style.setProperty('--dy', Math.sin(a) * r + 'px');
+      s.appendChild(st);
+    }
+    box.appendChild(s);
+    setTimeout(() => s.remove(), 1000);
+  };
+
+  let raf = 0, tm = 0;
+  const run = (dur, step, done) => {
+    const t0 = performance.now();
+    const tick = now => {
+      const t = Math.min((now - t0) / 1000, dur);
+      step(t);
+      if (t < dur) raf = requestAnimationFrame(tick); else if (done) done();
+    };
+    raf = requestAnimationFrame(tick);
+  };
+
+  // a~b년 구간을 모든 선이 함께 그려진다
+  const stage = (a, b, dur, done) => run(dur, t => {
+    const s = a + (b - a) * ease(t / dur);
+    let i = Math.floor(s); if (i >= b) i = b - 1;
+    const f = s - i;
+    keys.forEach(k => draw(k, i, { x: X(i + f), v: D[k][i] + (D[k][i + 1] - D[k][i]) * f }));
+  }, done);
+
+  // 마지막 구간: 최저 지수가 기준선 바로 아래에서 멈칫했다가 넘어간다
+  const special = done => {
+    const a = D[worst][year - 1], b = D[worst][year];
+    const h1 = crit - 0.6, h2 = crit - 0.15, T1 = 1.7, T2 = 2.7, T3 = 3.3;
+    const val = t => t < T1 ? a + (h1 - a) * easeOut(t / T1)
+                   : t < T2 ? h1 + (h2 - h1) * ((t - T1) / (T2 - T1))
+                   : h2 + (b - h2) * ease((t - T2) / (T3 - T2));
+    let fired = false;
+    run(T3, t => {
+      keys.forEach(k => {
+        if (k === worst) {
+          const v = val(t);
+          draw(k, year - 1, { x: X(year - 1) + (X(year) - X(year - 1)) * (v - a) / (b - a), v });
+          if (!fired && v >= crit) { fired = true; critLine.classList.add('pass'); spark(X(year - 1) + (X(year) - X(year - 1)) * (crit - a) / (b - a), Y(crit)); }
+        } else {
+          const f = ease(Math.min(t / 2.2, 1));
+          draw(k, year - 1, { x: X(year - 1) + (X(year) - X(year - 1)) * f, v: D[k][year - 1] + (D[k][year] - D[k][year - 1]) * f });
+        }
+      });
+    }, done);
+  };
+
+  const fillLegend = () => lg.querySelectorAll('.lgi').forEach((e, i) => { e.querySelector('b').textContent = fmtPct(D[keys[i]][year]); });
+
+  let finished = false, onFinish = null;
+  const finish = () => { if (finished) return; finished = true; fillLegend(); if (onFinish) onFinish(); };
+
+  return {
+    el: wrap,
+    // 카드가 나타난 뒤(0.35초) 선이 그려지기 시작한다. 끝나면 cb 호출
+    play(cb) {
+      onFinish = cb;
+      tm = setTimeout(() => {
+        if (dramatic) stage(0, year - 1, 1.6, () => { tm = setTimeout(() => special(finish), 450); });
+        else stage(0, year, 1 + 0.45 * year, finish);
+      }, 350);
+    },
+    // 그리는 도중 탭하면 애니메이션을 건너뛰고 완성 상태로
+    skip() {
+      if (finished) return;
+      cancelAnimationFrame(raf); clearTimeout(tm);
+      keys.forEach(k => draw(k, year - 1, { x: X(year), v: D[k][year] }));
+      if (dramatic) critLine.classList.add('pass');
+      finish();
+    },
+    stop() { cancelAnimationFrame(raf); clearTimeout(tm); }
+  };
+}
+
+function buildNews(root, id) {
+  const C = CONTENT[id], CH = CONTENT.chart;
+  root.classList.add('news');
+  root.appendChild(bgImg(C.bg));
+  root.appendChild(el('div', 'band ' + C.bandKind, esc(C.band)));
+
+  const t = esc(C.ticker);
+  root.appendChild(el('div', 'ticker ' + C.bandKind,
+    `<div class="tk-label">${esc(CH.tickerLabel)}</div><div class="tk-view"><div class="tk-run"><span>${t}</span><span>${t}</span></div></div>`));
+
+  const chart = createChart(C.year, C.criterion, !!C.dramatic);
+  const card = el('div', 'gcard');
+  const head = el('div', 'gh', `<div class="gt">${esc(CH.title)}<small>${esc(CH.subtitle)}</small></div>`);
+  const stamp = el('div', 'stamp ' + C.stamp.kind, `<b>${esc(C.stamp.text)}</b><span>${esc(C.stamp.sub)}</span>`);
+  head.appendChild(stamp);
+  card.append(head, chart.el);
+  root.appendChild(card);
+
+  const react = el('div', 'react');
+  react.appendChild(spouseImg(C.spouse.mood, 'char'));
+  react.appendChild(el('div', 'mini', `<span class="nm">${esc(spouse().name)}</span>${esc(C.spouse.text)}`));
+  root.appendChild(react);
+
+  const next = el('button', 'btn primary nextbtn', esc(C.next));
+  next.onclick = e => { e.stopPropagation(); go(C.nextId); };
+  root.appendChild(next);
+
+  const hint = el('div', 'taphint', `${esc(CONTENT.ui.tapHint)} <span>▼</span>`);
+  root.appendChild(hint);
+
+  // 대사가 끝난 뒤 탭할 때마다 한 단계씩:
+  //   1탭 그래프 등장(그리는 중 탭하면 건너뛰기) → 2탭 도장 → 3탭 배우자 반응 + [다음] 버튼
+  let step = 0, animating = false;
+  const advance = () => {
+    if (animating) { chart.skip(); return; }
+    if (step === 0) {
+      step = 1; animating = true;
+      hint.classList.remove('show');
+      root.querySelector('.bubble').classList.add('gone');
+      card.classList.add('show');
+      chart.play(() => { animating = false; hint.classList.add('show'); });
+    } else if (step === 1) {
+      step = 2;
+      stamp.classList.add('show');
+    } else if (step === 2) {
+      step = 3;
+      react.classList.add('show');
+      next.classList.add('show');
+      hint.classList.remove('show');
+    }
+  };
+  const d = createDialogue(root, C.lines, { onEnd: advance });
+  return () => { d.destroy(); chart.stop(); };
+}
+
+SCREENS.S06 = { build: root => buildNews(root, 'S06') };
+SCREENS.S07 = { build: root => buildNews(root, 'S07') };
+SCREENS.S08 = { build: root => buildNews(root, 'S08') };
+
+/* ---- S09 결과 (탭할 때마다: 축하 → 반전 → 나레이션 → [해설 듣기]) ---- */
+SCREENS.S09 = { build(root) {
+  const C = CONTENT.S09;
+  root.classList.add('s09');
+  root.appendChild(bgImg(C.bg));
+
+  const wrap = el('div', 'rwrap');
+  const c1 = el('div', 'rcard',
+    `<div class="lbl">${esc(C.rateLabel)}</div>` +
+    `<div class="rate">${esc(C.ratePrefix)}0.0${esc(C.rateSuffix)}</div>` +
+    `<div class="stats"><div><span>${esc(C.profitLabel)}</span><b>${esc(C.profit)}</b></div>` +
+    `<div><span>${esc(C.payoutLabel)}</span><b>${esc(C.payout)}</b></div></div>`);
+  const c2 = el('div', 'rcard',
+    `<div class="lbl">${esc(C.recoverLabel)}</div>` +
+    `<div class="amt">${esc(C.recoverAmount)}</div>` +
+    `<div class="rec"><small>${esc(C.recoverRateLabel)}</small>${esc(C.recoverRate)}</div>`);
+  wrap.append(c1, c2);
+  root.appendChild(wrap);
+
+  const next = el('button', 'btn primary nextbtn', esc(C.next));
+  next.onclick = e => { e.stopPropagation(); go(C.nextId); };
+  root.appendChild(next);
+  root.appendChild(el('div', 'notice9', esc(CONTENT.ui.notice)));
+
+  // 배우자 표정 교체
+  let curMood = null, charEl = null;
+  const setMood = mood => {
+    if (mood === curMood) return;
+    curMood = mood;
+    const n = spouseImg(mood, 'char');
+    if (charEl) charEl.replaceWith(n); else root.appendChild(n);
+    charEl = n;
+  };
+
+  // 수익률 카운트업
+  const rateEl = c1.querySelector('.rate');
+  let raf = 0, delay = 0;
+  delay = setTimeout(() => {
+    const t0 = performance.now(), dur = 1400;
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1);
+      rateEl.textContent = C.ratePrefix + (C.rate * easeOut(p)).toFixed(1) + C.rateSuffix;
+      if (p < 1) raf = requestAnimationFrame(tick); else c1.querySelector('.stats').classList.add('in');
+    };
+    raf = requestAnimationFrame(tick);
+  }, 400);
+
+  let ended = false;
+  const d = createDialogue(root, C.lines, {
+    onLine: line => {
+      setMood(line.mood);
+      if (line.phase) { c1.classList.toggle('on', line.phase === 1); c2.classList.toggle('on', line.phase === 2); }
+    },
+    onEnd: () => {
+      if (ended) return;
+      ended = true;
+      d.bubble.classList.add('gone');
+      next.classList.add('show');
+    }
+  });
+  return () => { d.destroy(); clearTimeout(delay); cancelAnimationFrame(raf); };
+}};
+
+/* ---- S10 앵커 해설 + 용어 카드 ---- */
+SCREENS.S10 = { build(root) {
+  const C = CONTENT.S10;
+  root.appendChild(bgImg(C.bg));
+
+  const sheet = el('div', 'sheet', `<h3>${esc(C.termsTitle)}</h3>`);
+  const list = el('div', 'terms');
+  C.terms.forEach(t => {
+    const card = el('div', 'term', `<button class="t"><span>${esc(t.name)}</span><i>+</i></button><div class="d">${fmt(t.desc)}</div>`);
+    card.querySelector('.t').onclick = () => card.classList.toggle('open');
+    list.appendChild(card);
+  });
+  const foot = el('div', 'foot');
+  const next = el('button', 'btn primary', esc(C.next));
+  next.onclick = () => go(C.nextId);
+  foot.appendChild(next);
+  sheet.append(list, foot);
+  sheet.onclick = e => e.stopPropagation();
+  root.appendChild(sheet);
+
+  let ended = false;
+  const d = createDialogue(root, C.lines, {
+    onEnd: () => {
+      if (ended) return;
+      ended = true;
+      d.bubble.classList.add('gone');
+      sheet.classList.add('show');
+    }
+  });
+  return () => d.destroy();
+}};
+
+/* ---- S11 퀴즈 ---- */
+SCREENS.S11 = { build(root) {
+  const C = CONTENT.S11;
+  root.classList.add('s11');
+
+  // 배경 3장을 겹쳐 두고 표정에 맞게 크로스페이드 (이미지가 없으면 플레이스홀더)
+  const layers = {};
+  [['default', 'bgAnchorDefault'], ['smile', 'bgAnchorSmile'], ['serious', 'bgAnchorSerious']].forEach(([name, key]) => {
+    const l = el('div', 'bgl' + (name === 'default' ? '' : ' off'));
+    l.appendChild(bgImg(key));
+    layers[name] = l; root.appendChild(l);
+  });
+  const showBg = name => Object.keys(layers).forEach(n => layers[n].classList.toggle('off', n !== name));
+
+  const timers = [], dlgs = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+  const qcard = el('div', 'qcard', `<span class="qtag">${esc(C.tag)}</span><div class="qq">${esc(C.question)}</div>`);
+  const btns = [];
+  const next = el('button', 'btn primary nextbtn', esc(C.next));
+  next.onclick = e => { e.stopPropagation(); go(C.nextId); };
+
+  let chosen = false;
+  const choose = i => {
+    if (chosen) return;
+    chosen = true;
+    const ok = i === C.answer;
+    state.quizCorrect = ok;
+    qcard.classList.add('locked');
+    btns[i].classList.add(ok ? 'right' : 'wrong');
+    if (!ok) btns[C.answer].classList.add('right');
+    later(() => {
+      qcard.classList.remove('show');
+      showBg(ok ? 'smile' : 'serious');
+      later(() => {
+        dlgs.push(createDialogue(root, [{ who: 'anchor', text: ok ? C.correct : C.wrong }], { onEnd: () => {} }));
+        later(() => next.classList.add('show'), 900);
+      }, 450);
+    }, 1000);
+  };
+  C.choices.forEach((t, i) => {
+    const b = el('button', 'qc', `<span class="no">${'①②③④'[i]}</span><span>${esc(t)}</span>`);
+    b.onclick = e => { e.stopPropagation(); choose(i); };
+    btns.push(b); qcard.appendChild(b);
+  });
+  root.append(qcard, next);
+
+  let shown = false;
+  const intro = createDialogue(root, C.intro, {
+    onEnd: () => {
+      if (shown) return;
+      shown = true;
+      intro.destroy();
+      intro.bubble.classList.add('gone');
+      later(() => intro.bubble.remove(), 350);
+      qcard.classList.add('show');
+    }
+  });
+  dlgs.push(intro);
+  return () => { dlgs.forEach(d => d.destroy()); timers.forEach(clearTimeout); };
+}};
+
+/* ---- S12 메인 ---- */
+const fmtMan = v => v.toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+SCREENS.S12 = { build(root) {
+  const C = CONTENT.S12, A = C.asset, R = C.recover;
+  root.classList.add('s12');
+  root.appendChild(bgImg(C.bg));
+  root.appendChild(spouseImg('happy', 'char'));
+
+  const cards = el('div', 'gcards');
+  cards.innerHTML =
+    `<div class="gc"><div class="gl">${esc(A.icon)} ${esc(A.label)}</div>` +
+      `<div class="gf">${esc(A.from)}</div><div class="gv" id="gvA">${fmtMan(A.fromNum)}${esc(A.unit)}</div>` +
+      `<div class="gauge"><i id="gaA"></i></div></div>` +
+    `<div class="gc"><div class="gl">${esc(R.icon)} ${esc(R.label)}</div>` +
+      `<div class="gf"></div><div class="gv" id="gvR">0.0${esc(R.unit)}</div>` +
+      `<div class="gauge"><i id="gaR"></i></div></div>`;
+  root.appendChild(cards);
+
+  const speech = el('div', 'speech', `<span class="nm">${esc(spouse().name)}</span>${esc(C.speech)}`);
+  root.appendChild(speech);
+
+  const actions = el('div', 'actions');
+  const nx = el('button', 'btn ghost', esc(C.next));
+  const mp = el('button', 'btn primary', esc(C.mypage));
+  nx.onclick = () => toast(C.nextToast);
+  mp.onclick = () => go(C.mypageId);
+  actions.append(nx, mp);
+  root.appendChild(actions);
+
+  // 게이지 + 숫자 카운트업
+  const gvA = cards.querySelector('#gvA'), gvR = cards.querySelector('#gvR');
+  const gaA = cards.querySelector('#gaA'), gaR = cards.querySelector('#gaR');
+  let raf = 0, t1 = 0, t2 = 0;
+  t1 = setTimeout(() => {
+    gaA.classList.add('on'); gaR.classList.add('on');
+    gaA.style.width = (A.to / A.gaugeMax * 100) + '%';
+    gaR.style.width = (R.to / R.gaugeMax * 100) + '%';
+    const t0 = performance.now(), dur = 1600;
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1), e = easeOut(p);
+      if (p < 1) {
+        gvA.textContent = fmtMan(A.fromNum + (A.to - A.fromNum) * e) + A.unit;
+        gvR.textContent = (R.to * e).toFixed(1) + R.unit;
+        raf = requestAnimationFrame(tick);
+      } else {
+        gvA.textContent = A.toText; gvR.textContent = R.toText;
+        speech.classList.add('show');
+      }
+    };
+    raf = requestAnimationFrame(tick);
+  }, 400);
+  return () => { clearTimeout(t1); clearTimeout(t2); cancelAnimationFrame(raf); };
+}};
+
+/* ---- S13 마이페이지 ---- */
+SCREENS.S13 = { build(root) {
+  const C = CONTENT.S13, P = CONTENT.product;
+  root.classList.add('app', 's13');
+  root.appendChild(el('div', 'head', `<span class="brand">${esc(CONTENT.ui.appName)}</span><h1>${esc(C.title)}</h1>`));
+  const body = el('div', 'body');
+
+  const prof = el('div', 'box profile');
+  const av = el('div', 'avatar');
+  av.appendChild(makeImg(spouse().img.default, ''));
+  prof.append(av, el('div', 'pt', esc(C.profile.replace('{name}', spouse().name))));
+  body.appendChild(prof);
+
+  body.appendChild(el('div', 'sec', esc(C.section)));
+
+  // 퀴즈 결과 배지는 S11 정답 여부를 반영 (S11을 거치지 않았으면 미응시)
+  const quiz = state.quizCorrect === true ? ['ok', C.quiz.correct]
+             : state.quizCorrect === false ? ['no', C.quiz.wrong] : ['', C.quiz.none];
+  const els = el('div', 'box els',
+    `<div><span class="nm">${esc(P.name)}</span><span class="mt">${esc(C.elsMeta)}</span></div>` +
+    `<div class="rt"><span class="l">${esc(C.rateLabel)}</span><span class="v">${esc(C.rate)}</span><span class="n">${esc(C.rateNote)}</span></div>` +
+    `<div class="badges"><span class="ok">${esc(C.learned)}</span><span class="${quiz[0]}">${esc(quiz[1])}</span></div>`);
+  const more = el('button', 'btn navy', esc(C.more));
+  more.style.padding = '13px 16px'; more.style.fontSize = '15px';
+  more.onclick = () => go(C.moreId);
+  els.appendChild(more);
+  body.appendChild(els);
+
+  C.slots.forEach(s => body.appendChild(el('div', 'slot',
+    `<span class="ic">${esc(s.icon)}</span><b>${esc(s.name)}</b><span>${esc(s.note)}</span>`)));
+  root.appendChild(body);
+}};
+
+/* ---- S14 상품 상세 (더 알아보기) ---- */
+SCREENS.S14 = { build(root) {
+  const C = CONTENT.S14, P = CONTENT.product;
+  root.classList.add('app', 's14');
+  root.appendChild(el('div', 'head', `<span class="brand">${esc(CONTENT.ui.appName)}</span><h1>${esc(C.title)}</h1>`));
+
+  const body = el('div', 'body');
+  body.appendChild(el('div', 'info', esc(C.info)));
+  const box = el('div', 'box', `<div class="pn">${esc(P.name)}</div>`);
+  C.rows.forEach(r => box.appendChild(el('div', 'kv',
+    `<span class="k">${esc(r.k)}</span><span class="v">${esc(r.v)}` +
+    (r.game ? `<span class="gm">${esc(C.gameLabel)}: ${esc(r.game)}</span>` : '') + `</span>`)));
+  body.appendChild(box);
+  root.appendChild(body);
+
+  const foot = el('div', 'foot');
+  const link = el('button', 'btn navy', esc(C.linkBtn));
+  link.onclick = () => window.open(C.link, '_blank', 'noopener');
+  foot.append(link, el('div', 'notice', esc(CONTENT.ui.notice)));
+  root.appendChild(foot);
+}};
+
+/* =====================================================================
+   화면 전환 / 내비게이션 / 해시
+   ===================================================================== */
+const stage = $('stage');
+let cur = null, curEl = null, curCleanup = null, hist = [];
+
+function go(id, opt = {}) {
+  if (!SCREENS[id]) id = 'S00';
+  const dir = opt.dir || 'fwd';
+
+  if (cur && !opt.noPush && !opt.replace) hist.push(cur);
+
+  const old = curEl;
+  if (curCleanup) { curCleanup(); curCleanup = null; }
+
+  const root = el('div', 'screen');
+  stage.appendChild(root);
+  curCleanup = SCREENS[id].build(root) || null;
+
+  if (old) {
+    old.classList.add('out');
+    setTimeout(() => old.remove(), 360);
+  }
+  if (opt.first) root.classList.add('no-anim');
+  else root.classList.add(dir === 'back' ? 'in-back' : 'in-fwd');
+
+  cur = id; curEl = root;
+  $('nav').classList.toggle('hide', SCREENS[id].nav === false);
+  history.replaceState(null, '', '#' + id);
+  if (!opt.first) flashSave();
+}
+
+function goBack() {
+  if (!hist.length) return;
+  go(hist.pop(), { dir: 'back', noPush: true });
+}
+function goHome() { hist = []; go('S00', { dir: 'back', noPush: true }); }
+
+$('btnBack').textContent = CONTENT.ui.back;
+$('btnHome').textContent = CONTENT.ui.home;
+$('btnBack').onclick = goBack;
+$('btnHome').onclick = goHome;
+
+window.addEventListener('hashchange', () => {
+  const id = location.hash.slice(1).toUpperCase();
+  if (id && id !== cur) go(id);
+});
+
+/* 폰 프레임을 화면 높이에 맞춰 축소 (PC) */
+function fit() {
+  const p = $('phone');
+  if (window.innerWidth <= 430) { p.style.transform = ''; return; }
+  const s = Math.min(1, (window.innerHeight - 24) / 864, (window.innerWidth - 24) / 410);
+  p.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', fit);
+fit();
+
+/* 시작: #S06 처럼 해시로 특정 화면에 바로 갈 수 있다 */
+const startId = (location.hash.slice(1) || 'S00').toUpperCase();
+go(SCREENS[startId] ? startId : 'S00', { first: true });
+</script>
+</body>
+</html>
